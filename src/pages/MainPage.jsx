@@ -36,7 +36,7 @@ export default function MainPage() {
       {/* Hero Section */}
       <section className="flex flex-col items-center justify-center text-center px-4 py-20">
         <h2 className="text-4xl md:text-5xl font-bold text-primary mb-6">
-          Bienvenido a tu nueva app
+          Bienvenido a Marketplace
         </h2>
         <p className="text-lg md:text-xl mb-8 max-w-xl">
           Esta aplicación está construida con React + Vite + Tailwind, y usa una paleta de colores personalizada y fuente Poppins.
