@@ -1,5 +1,24 @@
-// src/pages/MainPage.jsx
+import { useEffect, useState } from 'react';
+import { checkBackendStatus } from '@apis/api_EJEMPLO'; // Importa la función para verificar el estado del backend
+
 export default function MainPage() {
+  const [backendStatus, setBackendStatus] = useState(null); // Estado para almacenar el estado del backend
+  const [error, setError] = useState(null); // Estado para manejar errores
+
+  useEffect(() => {
+    const fetchBackendStatus = async () => {
+      try {
+        const status = await checkBackendStatus();
+        setBackendStatus(status); // Guarda el resultado en el estado
+      } catch (err) {
+        setError('Error al verificar el estado del backend');
+        console.error(err);
+      }
+    };
+
+    fetchBackendStatus();
+  }, []);
+
   return (
     <main className="bg-background text-neutral font-sans">
       {/* Header */}
@@ -21,6 +40,16 @@ export default function MainPage() {
         </h2>
         <p className="text-lg md:text-xl mb-8 max-w-xl">
           Esta aplicación está construida con React + Vite + Tailwind, y usa una paleta de colores personalizada y fuente Poppins.
+        </p>
+        <p className="text-lg md:text-xl mb-8 max-w-xl">
+          {/* Renderiza el estado del backend */}
+          {backendStatus ? (
+            <span>{backendStatus.status} - {backendStatus.timestamp}</span>
+          ) : error ? (
+            <span className="text-red-500">{error}</span>
+          ) : (
+            <span>Cargando estado del backend...</span>
+          )}
         </p>
         <button className="bg-secondary hover:bg-primary text-white font-semibold py-3 px-6 rounded-lg transition-all">
           Empezar ahora

@@ -1,18 +1,59 @@
-# React + Vite
+# 🛒 Marketplace App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este proyecto es una aplicación web desarrollada con **React**, utilizando **Vite** como bundler y **Tailwind CSS** como framework de estilos.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Tecnologías utilizadas
 
-## Expanding the ESLint configuration
+- ⚛️ **React**: Librería de JavaScript para construir interfaces de usuario.
+- ⚡ **Vite**: Empaquetador ultrarrápido para desarrollo moderno con React.
+- 🎨 **Tailwind CSS**: Framework utility-first para estilos rápidos y personalizables.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
 
+## 📦 Instalación
 
+1. Crear el proyecto:
 
+```bash
+npm create vite@latest
+# Seleccionar:
+# > Framework: React
+# > Variant: JavaScript
+cd marketplace
+npm install
+npm run dev
+```
+
+2. Instalar y configurar Tailwind CSS:
+
+Guía oficial: [Install Tailwind CSS with Vite](https://v3.tailwindcss.com/docs/guides/vite)
+
+```bash
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+```
+
+3. Configurar los archivos `tailwind.config.js` y `index.css` para que Tailwind funcione correctamente.
+
+---
+
+## 🎨 Estilos personalizados
+
+- Fuente `Poppins` importada desde Google Fonts y aplicada globalmente.
+- Paleta de colores definida en `tailwind.config.js` bajo `theme.extend.colors`.
+- Clases Tailwind como `bg-primary`, `text-neutral`, etc., están disponibles en todo el proyecto.
+
+Para modificar la paleta o la fuente, editá los archivos:
+- `src/styles/index.css` (fuentes)
+- `tailwind.config.js` (colores y extend)
+
+---
+
+## 🔍 Estructura de carpetas
+
+```bash
 my-app/
 ├── public/
 │   └── favicon.ico
@@ -29,8 +70,53 @@ my-app/
 │   ├── utils/             # Funciones auxiliares
 │   ├── App.jsx
 │   └── main.jsx
-├── .env
+├── .env                   # Variables de entorno
 ├── .gitignore
 ├── index.html
 ├── package.json
 └── vite.config.js
+```
+
+---
+
+## 🔧 Module resolver
+
+Se ha configurado un **module resolver** en `vite.config.js` para permitir imports más limpios:
+
+```js
+import Button from '@components/Button';
+import useAuth from '@hooks/useAuth';
+```
+
+Esto evita el uso de rutas relativas como `../../../components`.
+
+---
+
+## 🔌 Conexión con el backend
+
+La conexión con APIs externas se realiza a través de `axios`, organizada en la carpeta `src/apis/`.
+
+---
+
+## 🧪 Scripts disponibles
+
+- `npm run dev`: Ejecuta el servidor de desarrollo.
+- `npm run build`: Compila la app para producción.
+- `npm run preview`: Previsualiza la build de producción localmente.
+
+---
+
+## 📝 Personalización
+
+- Podés modificar la fuente o los colores desde:
+  - `index.html` → para fuentes de Google
+  - `tailwind.config.js` → para la paleta de colores
+  - `index.css` → para aplicar `@apply font-sans` global
+
+---
+
+## 📚 Recursos útiles
+
+- [Tailwind Cheat Sheet](https://nerdcave.com/tailwind-cheat-sheet)
+- [React Router Docs](https://reactrouter.com/en/main)
+- [Axios Docs](https://axios-http.com/docs/intro)
