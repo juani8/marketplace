@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: process.env.VITE_BACKEND_URL,
+  baseURL: import.meta.env.VITE_BACKEND_URL,
   // baseURL:'http://localhost:3000', // Para pruebas locales
   withCredentials: true
 });
