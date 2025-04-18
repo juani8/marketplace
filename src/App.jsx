@@ -1,19 +1,18 @@
-import { useState } from 'react'
-import { BrowserRouter, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import MainPage from '@pages/MainPage';
 
-import './App.css'
+import './App.css';
 
 function App() {
-
   return (
-    <>
-      <BrowserRouter>
-          <main>
-            <Route exact path="/" component={MainPage} />
-          </main>
-      </BrowserRouter>
-    </>
-  )
+    <BrowserRouter>
+      <main>
+        <Routes>
+          <Route path="/" element={<MainPage />} />
+        </Routes>
+      </main>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
