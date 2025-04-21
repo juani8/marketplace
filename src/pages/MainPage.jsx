@@ -60,9 +60,6 @@ export default function MainPage() {
           )}
         </p>
 
-        <button className="bg-secondary hover:bg-primary text-white font-semibold py-3 px-6 rounded-lg transition-all">
-          Empezar ahora
-        </button>
 
         <Link
           to="/tenants/create"
@@ -70,6 +67,14 @@ export default function MainPage() {
         >
           Crear nuevo Comercio
         </Link>
+
+        <Link
+          to="/tenants"
+          className="mt-4 inline-block bg-blue-500 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-600 transition"
+        >
+          Ver Comercios Registrados
+        </Link>
+
         <Link
           to="/tenants/delete"
           className="mt-4 inline-block bg-red-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-red-700 transition"

@@ -1,21 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getAllTenants } from '@apis/tenantsService';
 
-// 🧪 MOCK opcional
-const mockTenants = [
-  {
-    tenant_id: 1,
-    nombre: 'Panadería La Moderna',
-    razon_social: 'La Moderna S.A.',
-    estado: 'activo',
-  },
-  {
-    tenant_id: 2,
-    nombre: 'Verdulería El Tano',
-    razon_social: 'Verduras del Oeste SRL',
-    estado: 'inactivo',
-  },
-];
 
 export default function TenantsPage() {
   const [tenants, setTenants] = useState([]);
@@ -24,19 +9,12 @@ export default function TenantsPage() {
   useEffect(() => {
     const fetchTenants = async () => {
       try {
-        // 🔄 OPCIÓN 1: Usar datos reales desde el backend
-        //const data = await getAllTenants();
+        const data = await getAllTenants();
         setTenants(data);
-
-        // 🔁 OPCIÓN 2: Usar datos mockeados para pruebas (descomentar si el backend no está listo)
-        // setTenants(mockTenants);
 
       } catch (err) {
         console.error(err);
         setError('Error al obtener los tenants');
-
-        // Si el backend falla, también podés forzar el mock temporalmente
-        setTenants(mockTenants);
       }
     };
 
