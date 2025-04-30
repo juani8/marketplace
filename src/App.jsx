@@ -1,8 +1,11 @@
 import AppRouter from './router';
-import './App.css';
+import './App.css'; 
 
-function App() {
-  return <AppRouter />;
+export default function App() {
+  return (
+    <div className="min-h-screen flex flex-col relative">
+      <AppRouter />
+    </div>
+  );
 }
 
-export default App;

@@ -1,22 +1,29 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import MainPage from '../pages/MainPage';
-import TenantsPage from '../components/TenantsPage';
-import LoginPage from '../components/LoginPage';
-import CreateTenantPage from '../components/CreateTenantPage';
-import DeleteTenantPage from '../components/DeleteTenantPage';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import LoginPage from '../pages/LoginPage';
+import TenantsPage from '../pages/TenantsPage';
+import CreateTenantPage from '../pages/CreateTenantPage';
+import ModifyTenantPage from '../pages/ModifyTenantPage';
+import PrivateLayout from '../layouts/PrivateLayout';
+import PublicLayout from '../layouts/PublicLayout'; 
 
-function AppRouter() {
+export default function AppRouter() {
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
-        <Route path="/" element={<MainPage />} />
-        <Route path="/tenants" element={<TenantsPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/tenants/create" element={<CreateTenantPage />} />
-        <Route path="/tenants/delete" element={<DeleteTenantPage />} />
+        {/* Layout público para usuarios no logueados */}
+        <Route element={<PublicLayout />}>
+          <Route path="/" element={<LoginPage />} /> 
+          <Route path="/login" element={<LoginPage />} />
+        </Route>
+
+        {/* Layout privado para usuarios logueados */}
+        <Route element={<PrivateLayout />}>
+          <Route path="/tenants" element={<TenantsPage />} />
+          <Route path="/tenants/create" element={<CreateTenantPage />} />
+          <Route path="/tenants/edit/:id" element={<ModifyTenantPage />} />
+        </Route>
+
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
 }
-
-export default AppRouter;
