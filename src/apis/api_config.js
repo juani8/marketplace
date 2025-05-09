@@ -1,10 +1,8 @@
-// src/api/api.js
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL,
-  // baseURL:'http://localhost:3000', // Para pruebas locales
-  withCredentials: true
+  baseURL: 'https://marketplace-services-v8vn.onrender.com/api', // 
+  withCredentials: true,
 });
 
 export default api;
