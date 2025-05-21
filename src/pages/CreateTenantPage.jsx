@@ -61,20 +61,45 @@ export default function CreateTenantPage() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setIsLoading(true);
+  e.preventDefault();
+  setError('');
+  setIsLoading(true);
 
-    try {
-      await createTenant(formData);
-      setShowModal(true);
-    } catch (err) {
-      console.error(err);
-      setError('❌ Error al crear el comercio');
-    } finally {
-      setIsLoading(false);
+  try {
+    const horarios = formData.configuracion_operativa.horarios;
+    const diaActivo = Object.keys(horarios).find((dia) => horarios[dia]?.activo);
+
+    if (!diaActivo) {
+      throw new Error('Debes configurar al menos un día activo con horarios.');
     }
-  };
+
+    const horario_apertura = horarios[diaActivo].desde || '09:00';
+    const horario_cierre = horarios[diaActivo].hasta || '18:00';
+
+    // ⚠️ Este es el payload limpio que el backend espera
+    const payload = {
+  nombre: formData.nombre,
+  razon_social: formData.razon_social,
+  cuenta_bancaria: formData.cuenta_bancaria,
+  ...(formData.direccion?.trim() && { direccion: formData.direccion }),
+  configuracion_operativa: {
+    horario_apertura,
+    horario_cierre,
+  },
+};
+
+    console.log('Payload que se envía:', payload); // debug
+    const res = await createTenant(payload);
+    console.log('Respuesta del backend:', res);
+
+    setShowModal(true);
+  } catch (err) {
+    console.error(err);
+    setError(err.message || '❌ Error al crear el comercio');
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const nextStep = () => setStep((prev) => prev + 1);
   const prevStep = () => setStep((prev) => prev - 1);
