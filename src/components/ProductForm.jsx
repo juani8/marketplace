@@ -111,7 +111,6 @@ export default function ProductForm({
 
       {(error || validationErrors.length > 0) && (
         <div className="bg-red-100 border border-red-400 text-red-700 p-4 rounded">
-          <strong>Corrige los siguientes errores:</strong>
           <ul className="list-disc list-inside mt-2">
             {validationErrors.map((err, idx) => (
               <li key={idx}>{err}</li>

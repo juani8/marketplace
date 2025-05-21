@@ -61,9 +61,17 @@ export default function TenantForm({
         errors.push('El campo Email no es válido.');
       }
       if (!formData.datos_contacto.tel.trim()) errors.push('El campo Teléfono es obligatorio.');
-      if (formData.posee_direccion && !formData.direccion.trim()) errors.push('El campo Dirección es obligatorio.');
+      if (formData.posee_direccion) {
+        const { calle, numero, ciudad, provincia, codigo_postal } = formData.direccion;
+    
+        if (!calle.trim()) errors.push('El campo Calle es obligatorio.');
+        if (!numero.trim()) errors.push('El campo Número es obligatorio.');
+        if (!ciudad.trim()) errors.push('El campo Ciudad es obligatorio.');
+        if (!provincia.trim()) errors.push('El campo Provincia es obligatorio.');
+        if (!codigo_postal.trim()) errors.push('El campo Código Postal es obligatorio.');
+      }
     }
-
+    
     if (step === 3) {
       const horarios = formData.configuracion_operativa.horarios;
       const diasActivos = Object.keys(horarios).filter(day => horarios[day].activo);
@@ -108,11 +116,27 @@ export default function TenantForm({
 
   const hasErrors = (fieldName) => {
     if (!showErrors) return false;
-    if (fieldName.includes('.')) {
-      const [parent, child] = fieldName.split('.');
-      return !formData[parent][child].trim();
+  
+    const getValue = (name) => {
+      const parts = name.split('.');
+      let val = formData;
+      for (const part of parts) {
+        val = val?.[part];
+      }
+      return typeof val === 'string' ? val.trim() : val;
+    };
+  
+    const value = getValue(fieldName);
+  
+    const isDireccionField = fieldName.startsWith('direccion.');
+    const isGeocodeError =
+      error === 'La dirección ingresada no es válida o no se pudo geolocalizar.';
+  
+    if (isDireccionField && isGeocodeError) {
+      return true; // 🔴 Fuerza el borde rojo en todos los campos de dirección
     }
-    return !formData[fieldName].trim();
+  
+    return value === '' || value === undefined || value === null;
   };
 
   return (
@@ -132,17 +156,17 @@ export default function TenantForm({
         }}
       />
 
-      {(error || validationErrors.length > 0) && (
+      {showErrors && (error || validationErrors.length > 0) && (
         <div className="bg-red-100 border border-red-400 text-red-700 p-4 rounded mb-6">
-          <strong>Corrige los siguientes errores:</strong>
-          <ul className="mt-2 list-disc list-inside">
+          <ul className="list-disc list-inside">
             {validationErrors.map((err, idx) => (
               <li key={idx}>{err}</li>
             ))}
+            {error && <li>{error}</li>}
           </ul>
         </div>
       )}
-
+      
       {/* PASO 1 */}
       {step === 1 && (
         <>
@@ -199,7 +223,7 @@ export default function TenantForm({
               />
             </InputRowGrid>
 
-            <InputRowGrid>
+            <div className="grid grid-cols-1 gap-4 mt-4">
               <div className="mt-4">
                 <label className="block text-m font-medium text-gray-700 mb-0">¿Posee dirección física?</label>
                 <div className="flex items-center gap-4">
@@ -229,15 +253,45 @@ export default function TenantForm({
               </div>
 
               {formData.posee_direccion && (
-                <Input
-                  label="Dirección"
-                  name="direccion"
-                  value={formData.direccion}
-                  onChange={handleChange}
-                  hasError={hasErrors('direccion')}
-                />
+                <InputRowGrid>
+                  <Input
+                    label="Calle"
+                    name="direccion.calle"
+                    value={formData.direccion.calle}
+                    onChange={handleChange}
+                    hasError={hasErrors('direccion.calle')}
+                  />
+                  <Input
+                    label="Número"
+                    name="direccion.numero"
+                    value={formData.direccion.numero}
+                    onChange={handleChange}
+                    hasError={hasErrors('direccion.numero')}
+                  />
+                  <Input
+                    label="Ciudad"
+                    name="direccion.ciudad"
+                    value={formData.direccion.ciudad}
+                    onChange={handleChange}
+                    hasError={hasErrors('direccion.ciudad')}
+                  />
+                  <Input
+                    label="Provincia"
+                    name="direccion.provincia"
+                    value={formData.direccion.provincia}
+                    onChange={handleChange}
+                    hasError={hasErrors('direccion.provincia')}
+                  />
+                  <Input
+                    label="Código Postal"
+                    name="direccion.codigo_postal"
+                    value={formData.direccion.codigo_postal}
+                    onChange={handleChange}
+                    hasError={hasErrors('direccion.codigo_postal')}
+                  />
+                </InputRowGrid>
               )}
-            </InputRowGrid>
+            </div>
           </Step>
           <StepNavigation nextStep={handleNext} prevStep={handlePrev} />
         </>

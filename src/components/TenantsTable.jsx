@@ -29,8 +29,9 @@ export default function TenantsTable({ tenants, onEdit, onDelete }) {
             {tenants.map((tenant) => (
               <tr key={tenant.tenant_id} className="border-t text-sm">
                 <td className="py-3 px-6">{tenant.nombre}</td>
-                <td className="py-3 px-6">
-                  {tenant.posee_direccion ? tenant.direccion : '-'}
+                <td className="py-3 px-6">{tenant.calle
+                  ? `${tenant.calle} ${tenant.numero}, ${tenant.ciudad}, ${tenant.provincia}`
+                  : '-'}
                 </td>
                 <td className="py-3 px-6">{tenant.datos_contacto?.email || '-'}</td>
                 <td className="py-3 px-6">
@@ -67,7 +68,9 @@ export default function TenantsTable({ tenants, onEdit, onDelete }) {
             </div>
             <div className="mb-2">
               <span className="font-semibold">Dirección:</span>{' '}
-              {tenant.posee_direccion ? tenant.direccion : '-'}
+              {tenant.calle
+              ? `${tenant.calle} ${tenant.numero}, ${tenant.ciudad}, ${tenant.provincia}`
+              : '-'}
             </div>
             <div className="mb-2">
               <span className="font-semibold">Email:</span>{' '}
