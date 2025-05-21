@@ -289,7 +289,6 @@ export default function TenantForm({
                     onChange={handleChange}
                     hasError={hasErrors('direccion.codigo_postal')}
                   />
-
                 </InputRowGrid>
               )}
             </div>

@@ -12,7 +12,7 @@ Este proyecto es una aplicación web desarrollada con **React**, utilizando **Vi
 
 ---
 
-## 📦 Instalación
+## 📦 Instalación (⚠️ ¡No replicar, el proyecto ya fue configurado!)
 
 1. Crear el proyecto:
 
@@ -46,8 +46,9 @@ npx tailwindcss init -p
 - Clases Tailwind como `bg-primary`, `text-neutral`, etc., están disponibles en todo el proyecto.
 
 Para modificar la paleta o la fuente, editá los archivos:
-- `src/styles/index.css` (fuentes)
-- `tailwind.config.js` (colores y extend)
+- `index.html` → para fuentes de Google
+- `tailwind.config.js` → para la paleta de colores
+- `index.css` → para aplicar `@apply font-sans` global
 
 ---
 
@@ -103,15 +104,6 @@ La conexión con APIs externas se realiza a través de `axios`, organizada en la
 - `npm run dev`: Ejecuta el servidor de desarrollo.
 - `npm run build`: Compila la app para producción.
 - `npm run preview`: Previsualiza la build de producción localmente.
-
----
-
-## 📝 Personalización
-
-- Podés modificar la fuente o los colores desde:
-  - `index.html` → para fuentes de Google
-  - `tailwind.config.js` → para la paleta de colores
-  - `index.css` → para aplicar `@apply font-sans` global
 
 ---
 
