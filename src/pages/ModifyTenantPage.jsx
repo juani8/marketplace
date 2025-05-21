@@ -99,8 +99,10 @@ export default function ModifyTenantPage() {
   }
 
   return (
-    <div>
-      <h1 className="text-xl md:text-2xl font-bold text-gray-800 mb-6">Modificar Comercio</h1>
+    <div className="p-5">
+      <div className="mb-4">
+        <h1 className="text-2xl font-bold text-gray-800">Modificar Comercio</h1>
+      </div>
 
       {noChangesNotice && (
         <div className="text-yellow-600 bg-yellow-100 border border-yellow-300 p-3 rounded mb-4">
@@ -139,7 +141,8 @@ export default function ModifyTenantPage() {
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         successMessage="¡Comercio modificado exitosamente!"
-        redirectTo="/tenants"
+        redirectTo={`/tenants`}
+        buttonText="Volver al Portal de Tenants"
       />
     </div>
   );

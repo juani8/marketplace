@@ -12,13 +12,13 @@ import PropTypes from 'prop-types';
 export default function Sidebar({ isCollapsed, toggleSidebar }) {
   const location = useLocation();
 
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) => location.pathname.startsWith(path);
 
   return (
     <aside
       className={`bg-dark text-white ${
         isCollapsed ? 'w-20' : 'w-64'
-      } min-h-screen flex flex-col transition-all duration-300`}
+      } h-screen fixed top-0 left-0 z-40 flex flex-col transition-all duration-300`}
     >
       {/* Logo */}
       <div
@@ -34,7 +34,7 @@ export default function Sidebar({ isCollapsed, toggleSidebar }) {
       {/* Navegación */}
       <nav className="flex-1 flex flex-col gap-2 px-2">
         <Link
-          to="/tenants"
+          to="/dashboard"
           className={`flex items-center gap-3 px-2 py-2 rounded hover:bg-blue-600 ${
             isActive('/dashboard') ? 'bg-blue-700' : ''
           }`}
@@ -42,6 +42,7 @@ export default function Sidebar({ isCollapsed, toggleSidebar }) {
           <FaTachometerAlt className="text-xl" />
           {!isCollapsed && <span>Dashboard</span>}
         </Link>
+
         <Link
           to="/tenants"
           className={`flex items-center gap-3 px-2 py-2 rounded hover:bg-blue-600 ${
@@ -51,8 +52,9 @@ export default function Sidebar({ isCollapsed, toggleSidebar }) {
           <FaStore className="text-xl" />
           {!isCollapsed && <span>Comercios</span>}
         </Link>
+
         <Link
-          to="/tenants"
+          to="/products/select-tenant"
           className={`flex items-center gap-3 px-2 py-2 rounded hover:bg-blue-600 ${
             isActive('/products') ? 'bg-blue-700' : ''
           }`}
@@ -60,19 +62,21 @@ export default function Sidebar({ isCollapsed, toggleSidebar }) {
           <FaBoxOpen className="text-xl" />
           {!isCollapsed && <span>Productos</span>}
         </Link>
+
         <Link
-          to="/tenants"
+          to="/promociones"
           className={`flex items-center gap-3 px-2 py-2 rounded hover:bg-blue-600 ${
-            isActive('/promotions') ? 'bg-blue-700' : ''
+            isActive('/promociones') ? 'bg-blue-700' : ''
           }`}
         >
           <FaTags className="text-xl" />
           {!isCollapsed && <span>Promociones</span>}
         </Link>
+
         <Link
-          to="/tenants"
+          to="/configuracion"
           className={`flex items-center gap-3 px-2 py-2 rounded hover:bg-blue-600 ${
-            isActive('/settings') ? 'bg-blue-700' : ''
+            isActive('/configuracion') ? 'bg-blue-700' : ''
           }`}
         >
           <FaCog className="text-xl" />

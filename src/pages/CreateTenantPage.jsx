@@ -80,8 +80,10 @@ export default function CreateTenantPage() {
   const prevStep = () => setStep((prev) => prev - 1);
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-gray-800 mb-8">Añadir Comercio</h1>
+    <div className="p-5">
+      <div className="mb-4">
+        <h1 className="text-2xl font-bold text-gray-800">Añadir Comercio</h1>
+      </div>
 
       <TenantForm
         formData={formData}
@@ -110,7 +112,8 @@ export default function CreateTenantPage() {
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         successMessage="¡Comercio creado exitosamente!"
-        redirectTo="/tenants"
+        redirectTo={`/tenants`}
+        buttonText="Volver al Portal de Tenants"
       />
     </div>
   );

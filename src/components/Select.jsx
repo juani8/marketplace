@@ -10,11 +10,13 @@ export default function Select({ label, name, value, onChange, options, hasError
         onChange={onChange}
         className={`w-full border px-3 py-2 rounded ${hasError ? 'border-red-500' : 'border-gray-300'} focus:outline-none focus:ring focus:border-blue-300`}
       >
-        {options.map((opt) => (
-          <option key={opt} value={opt}>
-            {opt}
-          </option>
-        ))}
+        {options.map((opt) =>
+          typeof opt === 'string' ? (
+            <option key={opt} value={opt}>{opt}</option>
+          ) : (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          )
+        )}
       </select>
     </div>
   );
@@ -25,6 +27,14 @@ Select.propTypes = {
   name: PropTypes.string.isRequired,
   value: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
-  options: PropTypes.arrayOf(PropTypes.string).isRequired,
+  options: PropTypes.arrayOf(
+    PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.shape({
+        label: PropTypes.string.isRequired,
+        value: PropTypes.string.isRequired,
+      }),
+    ])
+  ).isRequired,
   hasError: PropTypes.bool,
 };

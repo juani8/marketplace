@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Step from './Step';
 import Input from './Input';
 import Select from './Select';
 import StepNavigation from './StepNavigation';
 import ScheduleInput from './ScheduleInput';
-import StepIndicator from './StepIndicator'; 
+import StepIndicator from './StepIndicator';
+import InputRowGrid from './InputRowGrid'; // nuevo
 
 export default function TenantForm({
   formData,
@@ -21,6 +21,20 @@ export default function TenantForm({
   setShowErrors,
   isLoading,
 }) {
+  TenantForm.propTypes = {
+    formData: PropTypes.object.isRequired,
+    handleChange: PropTypes.func.isRequired,
+    handleSubmit: PropTypes.func.isRequired,
+    step: PropTypes.number.isRequired,
+    setStep: PropTypes.func.isRequired,
+    nextStep: PropTypes.func.isRequired,
+    prevStep: PropTypes.func.isRequired,
+    error: PropTypes.string,
+    showErrors: PropTypes.bool.isRequired,
+    setShowErrors: PropTypes.func.isRequired,
+    isLoading: PropTypes.bool.isRequired,
+  };
+  
   const [validationErrors, setValidationErrors] = useState([]);
 
   const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
@@ -102,10 +116,14 @@ export default function TenantForm({
   };
 
   return (
-    <form onSubmit={handleFinalSubmit} className="bg-white p-4 sm:p-8 rounded-lg shadow-lg w-full max-w-5xl space-y-6">
-      {/* Stepper visual con click para retroceder */}
+    <form onSubmit={handleFinalSubmit} className="bg-white p-6 rounded shadow space-y-6 w-full max-w-5xl mx-auto">
       <StepIndicator
         currentStep={step}
+        steps={[
+          'Datos Básicos',
+          'Contacto y Dirección',
+          'Configuración y Finalización',
+        ]}
         onStepClick={(targetStep) => {
           if (targetStep < step) {
             setShowErrors(false);
@@ -129,27 +147,32 @@ export default function TenantForm({
       {step === 1 && (
         <>
           <Step title="Datos Básicos">
-            <Input
-              label="Nombre"
-              name="nombre"
-              value={formData.nombre}
-              onChange={handleChange}
-              hasError={hasErrors('nombre')}
-            />
-            <Input
-              label="Razón Social"
-              name="razon_social"
-              value={formData.razon_social}
-              onChange={handleChange}
-              hasError={hasErrors('razon_social')}
-            />
-            <Input
-              label="Cuenta Bancaria"
-              name="cuenta_bancaria"
-              value={formData.cuenta_bancaria}
-              onChange={handleChange}
-              hasError={hasErrors('cuenta_bancaria')}
-            />
+            <InputRowGrid>
+              <Input
+                label="Nombre"
+                name="nombre"
+                value={formData.nombre}
+                onChange={handleChange}
+                hasError={hasErrors('nombre')}
+              />
+              <Input
+                label="Razón Social"
+                name="razon_social"
+                value={formData.razon_social}
+                onChange={handleChange}
+                hasError={hasErrors('razon_social')}
+              />
+            </InputRowGrid>
+
+            <div className="mt-4">
+              <Input
+                label="Cuenta Bancaria"
+                name="cuenta_bancaria"
+                value={formData.cuenta_bancaria}
+                onChange={handleChange}
+                hasError={hasErrors('cuenta_bancaria')}
+              />
+            </div>
           </Step>
           <StepNavigation nextStep={handleNext} />
         </>
@@ -159,46 +182,62 @@ export default function TenantForm({
       {step === 2 && (
         <>
           <Step title="Contacto y Dirección">
-            <Input label="Email" name="datos_contacto.email" value={formData.datos_contacto.email} onChange={handleChange} hasError={hasErrors('datos_contacto.email')} />
-            <Input label="Teléfono" name="datos_contacto.tel" value={formData.datos_contacto.tel} onChange={handleChange} hasError={hasErrors('datos_contacto.tel')} />
-
-            <div className="mb-4">
-              <label className="block text-m font-medium text-gray-700 mb-0">¿Posee dirección física?</label>
-              <div className="flex items-center gap-4">
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="posee_direccion"
-                    value="true"
-                    checked={formData.posee_direccion === true}
-                    onChange={() => handleChange({ target: { name: 'posee_direccion', value: true, type: 'radio' } })}
-                    className="mr-2"
-                  />
-                  Sí
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="posee_direccion"
-                    value="false"
-                    checked={formData.posee_direccion === false}
-                    onChange={() => handleChange({ target: { name: 'posee_direccion', value: false, type: 'radio' } })}
-                    className="mr-2"
-                  />
-                  No
-                </label>
-              </div>
-            </div>
-
-            {formData.posee_direccion && (
+            <InputRowGrid>
               <Input
-                label="Dirección"
-                name="direccion"
-                value={formData.direccion}
+                label="Email"
+                name="datos_contacto.email"
+                value={formData.datos_contacto.email}
                 onChange={handleChange}
-                hasError={hasErrors('direccion')}
+                hasError={hasErrors('datos_contacto.email')}
               />
-            )}
+              <Input
+                label="Teléfono"
+                name="datos_contacto.tel"
+                value={formData.datos_contacto.tel}
+                onChange={handleChange}
+                hasError={hasErrors('datos_contacto.tel')}
+              />
+            </InputRowGrid>
+
+            <InputRowGrid>
+              <div className="mt-4">
+                <label className="block text-m font-medium text-gray-700 mb-0">¿Posee dirección física?</label>
+                <div className="flex items-center gap-4">
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="posee_direccion"
+                      value="true"
+                      checked={formData.posee_direccion === true}
+                      onChange={() => handleChange({ target: { name: 'posee_direccion', value: true, type: 'radio' } })}
+                      className="mr-2"
+                    />
+                    Sí
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="posee_direccion"
+                      value="false"
+                      checked={formData.posee_direccion === false}
+                      onChange={() => handleChange({ target: { name: 'posee_direccion', value: false, type: 'radio' } })}
+                      className="mr-2"
+                    />
+                    No
+                  </label>
+                </div>
+              </div>
+
+              {formData.posee_direccion && (
+                <Input
+                  label="Dirección"
+                  name="direccion"
+                  value={formData.direccion}
+                  onChange={handleChange}
+                  hasError={hasErrors('direccion')}
+                />
+              )}
+            </InputRowGrid>
           </Step>
           <StepNavigation nextStep={handleNext} prevStep={handlePrev} />
         </>
@@ -208,33 +247,44 @@ export default function TenantForm({
       {step === 3 && (
         <>
           <Step title="Configuración y Finalización">
-            <ScheduleInput horarios={formData.configuracion_operativa.horarios} handleChange={handleChange} />
-            <div className="grid grid-cols-1 gap-4 mt-6">
-              <Select
-                label="Tipo de Servicio"
-                name="configuracion_operativa.tipo_servicio"
-                value={formData.configuracion_operativa.tipo_servicio}
-                onChange={handleChange}
-                options={['envio', 'retiro', 'ambos']}
-                hasError={hasErrors('configuracion_operativa.tipo_servicio')}
-              />
-              <Input
-                label="Catálogo ID"
-                name="catalogo_id"
-                value={formData.catalogo_id}
-                onChange={handleChange}
-                hasError={hasErrors('catalogo_id')}
-              />
-              <Select
-                label="Estado"
-                name="estado"
-                value={formData.estado}
-                onChange={handleChange}
-                options={['activo', 'inactivo']}
-                hasError={hasErrors('estado')}
-              />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-2">
+              {/* Columna de Horarios */}
+              <div>
+                <ScheduleInput
+                  horarios={formData.configuracion_operativa.horarios}
+                  handleChange={handleChange}
+                />
+              </div>
+
+              {/* Columna de configuración */}
+              <div className="space-y-4">
+                <Select
+                  label="Tipo de Servicio"
+                  name="configuracion_operativa.tipo_servicio"
+                  value={formData.configuracion_operativa.tipo_servicio}
+                  onChange={handleChange}
+                  options={['envio', 'retiro', 'ambos']}
+                  hasError={hasErrors('configuracion_operativa.tipo_servicio')}
+                />
+                <Input
+                  label="Catálogo ID"
+                  name="catalogo_id"
+                  value={formData.catalogo_id}
+                  onChange={handleChange}
+                  hasError={hasErrors('catalogo_id')}
+                />
+                <Select
+                  label="Estado"
+                  name="estado"
+                  value={formData.estado}
+                  onChange={handleChange}
+                  options={['activo', 'inactivo']}
+                  hasError={hasErrors('estado')}
+                />
+              </div>
             </div>
           </Step>
+          
 
           <div className="flex justify-between items-center mt-6">
             <button
@@ -265,17 +315,3 @@ export default function TenantForm({
     </form>
   );
 }
-
-TenantForm.propTypes = {
-  formData: PropTypes.object.isRequired,
-  handleChange: PropTypes.func.isRequired,
-  handleSubmit: PropTypes.func.isRequired,
-  step: PropTypes.number.isRequired,
-  setStep: PropTypes.func.isRequired,
-  nextStep: PropTypes.func.isRequired,
-  prevStep: PropTypes.func.isRequired,
-  error: PropTypes.string,
-  showErrors: PropTypes.bool.isRequired,
-  setShowErrors: PropTypes.func.isRequired,
-  isLoading: PropTypes.bool.isRequired,
-};

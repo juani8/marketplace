@@ -1,12 +1,6 @@
 import PropTypes from 'prop-types';
 
-export default function StepIndicator({ currentStep, onStepClick }) {
-  const steps = [
-    'Datos Básicos',
-    'Contacto y Dirección',
-    'Configuración y Finalización',
-  ];
-
+export default function StepIndicator({ currentStep, onStepClick, steps }) {
   return (
     <div className="mb-6">
       {/* Mobile (solo paso actual) */}
@@ -43,7 +37,7 @@ export default function StepIndicator({ currentStep, onStepClick }) {
               >
                 {stepNumber}
               </button>
-              <span className={`text-sm ${isActive ? 'font-medium text-gray-900' : 'text-gray-500'}`}>
+              <span className={`text-sm ${isActive ? 'font-bold text-gray-900' : 'text-gray-500'}`}>
                 {label}
               </span>
               {stepNumber < steps.length && <div className="mx-1 text-gray-400">→</div>}
@@ -58,4 +52,5 @@ export default function StepIndicator({ currentStep, onStepClick }) {
 StepIndicator.propTypes = {
   currentStep: PropTypes.number.isRequired,
   onStepClick: PropTypes.func.isRequired,
+  steps: PropTypes.arrayOf(PropTypes.string).isRequired,
 };

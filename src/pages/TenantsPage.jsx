@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaPlus } from 'react-icons/fa';
-
+import ButtonAdd from '../components/ButtonAdd';
 import ConfirmationModal from '../components/ConfirmationModal';
 import SearchInput from '../components/SearchInput';
 import TenantsTable from '../components/TenantsTable';
@@ -70,17 +70,10 @@ export default function TenantsPage() {
   );
 
   return (
-    <div className="p-8">
+    <div className="p-5">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0 mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Comercios</h1>
-
-        <button
-          onClick={handleAddTenant}
-          className="flex items-center gap-2 border border-primary text-primary px-4 py-2 rounded-lg hover:bg-primary hover:text-white transition"
-        >
-          <FaPlus />
-          Añadir Comercio
-        </button>
+        <ButtonAdd onClick={handleAddTenant} text="Añadir Comercio" />
       </div>
 
       {deletionMessage && (

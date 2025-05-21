@@ -2,9 +2,9 @@ import PropTypes from 'prop-types';
 
 export default function Step({ title, children }) {
   return (
-    <div className="mb-6">
-      <h3 className="text-lg font-semibold mb-4 text-neutral">{title}</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">{children}</div>
+    <div className="space-y-4">
+      <h2 className="text-lg font-semibold text-gray-800 hidden sm:block">{title}</h2>
+      {children}
     </div>
   );
 }

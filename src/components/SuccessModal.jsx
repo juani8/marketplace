@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
-export default function SuccessModal({ isOpen, onClose, successMessage = "¡Operación exitosa!", redirectTo = "/" }) {
+export default function SuccessModal({ isOpen, onClose, successMessage = "¡Operación exitosa!", redirectTo = "/", buttonText = "Volver a Portal de Comercios" }) {
   const navigate = useNavigate();
 
   if (!isOpen) return null; // Si no está abierto, no renderiza nada
@@ -21,9 +22,17 @@ export default function SuccessModal({ isOpen, onClose, successMessage = "¡Oper
           onClick={handleRedirect}
           className="bg-primary hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition mt-4"
         >
-          Volver a Portal de Comercios
+          {buttonText}
         </button>
       </div>
     </div>
   );
+}
+
+SuccessModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  successMessage: PropTypes.string,
+  redirectTo: PropTypes.string,
+  buttonText: PropTypes.string,
 }

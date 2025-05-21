@@ -25,14 +25,19 @@ export default function PrivateLayout() {
         </div>
       )}
 
-      {/* Sidebar fijo para desktop */}
-      <div className="flex min-h-screen bg-background">
-        <div className={`hidden sm:block ${isCollapsed ? 'w-20' : 'w-64'} transition-all duration-300`}>
+      {/* Layout principal */}
+      <div
+        className={`flex min-h-screen bg-background transition-all duration-300 ${
+          isCollapsed ? 'sm:ml-20' : 'sm:ml-64'
+        }`}
+      >
+        {/* Sidebar fijo solo desktop */}
+        <div className="hidden sm:block">
           <Sidebar isCollapsed={isCollapsed} toggleSidebar={toggleSidebar} />
         </div>
 
         {/* Contenido principal */}
-        <main className="flex-1 p-4 sm:p-8 transition-all">
+        <main className="flex-1 p-4 sm:p-5 transition-all bg-background min-w-0 overflow-x-auto">
           {/* Botón de menú en mobile */}
           <div className="sm:hidden mb-4">
             <button

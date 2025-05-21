@@ -10,6 +10,8 @@ export default function Input({ label, name, value, onChange, hasError, type = '
         value={value}
         onChange={onChange}
         className={`w-full border px-3 py-2 rounded ${hasError ? 'border-red-500' : 'border-gray-300'} focus:outline-none focus:ring focus:border-blue-300`}
+        min={type === 'number' ? 0 : undefined}
+        step={type === 'number' && name === 'stock' ? 1 : undefined}
       />
     </div>
   );
