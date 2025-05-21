@@ -1,18 +1,11 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import MainPage from '@pages/MainPage';
+import AppRouter from './router';
+import './App.css'; 
 
-import './App.css';
-
-function App() {
+export default function App() {
   return (
-    <BrowserRouter>
-      <main>
-        <Routes>
-          <Route path="/" element={<MainPage />} />
-        </Routes>
-      </main>
-    </BrowserRouter>
+    <div className="min-h-screen flex flex-col relative">
+      <AppRouter />
+    </div>
   );
 }
 
-export default App;
