@@ -1,9 +1,11 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginPage from '../pages/LoginPage';
 import TenantProfilePage from '../pages/TenantProfilePage';
-import ProductsCataloguePage from '../pages/ProductsCataloguePage';
+import ProductsCataloguePage from '../pages/ProductscataloguePage';
 import EditProductPage from '../pages/EditProductPage';
 import CreateProductPage from '../pages/CreateProductPage';
+import PromotionsPage from '../pages/PromotionsPage';
+import CreatePromotionPage from '../pages/CreatePromotionPage';
 import PrivateLayout from '../layouts/PrivateLayout';
 import PublicLayout from '../layouts/PublicLayout'; 
 
@@ -23,6 +25,8 @@ export default function AppRouter() {
           <Route path="/products/" element={<ProductsCataloguePage />} />
           <Route path="/products/create/:tenantId" element={<CreateProductPage />} />
           <Route path="/products/edit/:tenantId/:productId" element={<EditProductPage />} />
+          <Route path="/promociones" element={<PromotionsPage />} />
+          <Route path="/promociones/create" element={<CreatePromotionPage />} />
         </Route>
 
       </Routes>
