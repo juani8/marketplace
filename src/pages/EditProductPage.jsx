@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import ProductForm from '../components/ProductForm';
 import SuccessModal from '../components/SuccessModal';
 import { getProductById, updateProduct } from '../apis/productsService';
+import { getAllCategories } from '../apis/categoriesService';
 
 export default function EditProductPage() {
   const { tenantId, productId } = useParams();
@@ -14,28 +15,36 @@ export default function EditProductPage() {
   const [showErrors, setShowErrors] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-    async function fetchProduct() {
+    async function fetchData() {
       try {
-        const product = await getProductById(productId);
+        const [product, allCategories] = await Promise.all([
+          getProductById(productId),
+          getAllCategories()
+        ]);
+
         if (!product) return navigate(`/products/catalogue/${tenantId}`);
 
-        // Parsear campos numéricos/booleanos si es necesario
-        setFormData({
-          ...product,
-        });
-      } catch {
+        const formattedCategories = allCategories.map((cat) => ({
+          value: String(cat.categoria_id),
+          label: cat.nombre,
+        }));
+
+        setFormData({ ...product });
+        setCategories(formattedCategories);
+      } catch (err) {
+        console.error('Error al cargar datos:', err);
         navigate(`/products/catalogue/${tenantId}`);
       }
     }
 
-    fetchProduct();
+    fetchData();
   }, [tenantId, productId, navigate]);
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
-
     const parsedValue =
       type === 'radio'
         ? value === 'true'
@@ -53,11 +62,11 @@ export default function EditProductPage() {
     e.preventDefault();
     setIsLoading(true);
     setError('');
-  
+
     try {
       const cleanFormData = { ...formData };
-      delete cleanFormData.catalogo_id; // 💥 evitamos que dispare la lógica del catálogo
-  
+      delete cleanFormData.catalogo_id;
+
       await updateProduct(tenantId, cleanFormData);
       setShowModal(true);
     } catch (err) {
@@ -75,6 +84,7 @@ export default function EditProductPage() {
       <div className="mb-4">
         <h1 className="text-2xl font-bold text-gray-800">Editar Producto</h1>
       </div>
+
       <ProductForm
         formData={formData}
         handleChange={handleChange}
@@ -87,6 +97,7 @@ export default function EditProductPage() {
         showErrors={showErrors}
         setShowErrors={setShowErrors}
         isLoading={isLoading}
+        categories={categories}
       />
 
       <SuccessModal
