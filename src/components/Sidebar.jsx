@@ -44,17 +44,17 @@ export default function Sidebar({ isCollapsed, toggleSidebar }) {
         </Link>
 
         <Link
-          to="/tenants"
+          to="/perfil"
           className={`flex items-center gap-3 px-2 py-2 rounded hover:bg-blue-600 ${
-            isActive('/tenants') ? 'bg-blue-700' : ''
+            isActive('/perfil') ? 'bg-blue-700' : ''
           }`}
         >
           <FaStore className="text-xl" />
-          {!isCollapsed && <span>Comercios</span>}
+          {!isCollapsed && <span>Mi perfil</span>}
         </Link>
 
         <Link
-          to="/products/select-tenant"
+          to="/products"
           className={`flex items-center gap-3 px-2 py-2 rounded hover:bg-blue-600 ${
             isActive('/products') ? 'bg-blue-700' : ''
           }`}

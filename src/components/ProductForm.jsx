@@ -8,7 +8,6 @@ import StepNavigation from './StepNavigation';
 import InputRowGrid from './InputRowGrid';
 import ImageReorderGrid from './ImageReorderGrid';
 
-
 export default function ProductForm({
   formData,
   handleChange,
@@ -36,13 +35,6 @@ export default function ProductForm({
     if (step === 2) {
       if (formData.precio === '' || formData.precio < 0) errors.push('El campo Precio es obligatorio.');
       if (formData.stock === '' || formData.stock < 0) errors.push('El campo Stock es obligatorio.');
-      if (formData.oferta === true) {
-        if (formData.precio_descuento === '' || formData.precio_descuento < 0) {
-          errors.push('El campo Precio con Descuento es obligatorio y no puede ser negativo si el producto está en oferta.');
-        } else if (formData.precio_descuento >= formData.precio) {
-          errors.push('El Precio con Descuento debe ser menor que el Precio original.');
-        }
-      }
     }
 
     setValidationErrors(errors);
@@ -64,12 +56,6 @@ export default function ProductForm({
       }
 
       handleChange({ target: { name, value: parsedValue } });
-    } else if (type === 'radio') {
-      const booleanValue = value === 'true';
-      if (name === 'oferta' && !booleanValue) {
-        handleChange({ target: { name: 'precio_descuento', value: '' } });
-      }
-      handleChange({ target: { name, value: booleanValue } });
     } else {
       handleChange(e);
     }
@@ -101,11 +87,7 @@ export default function ProductForm({
     <form onSubmit={handleFinalSubmit} className="bg-white p-6 rounded shadow space-y-6 w-full max-w-5xl mx-auto">
       <StepIndicator
         currentStep={step}
-        steps={[
-          'Información del Producto',
-          'Precios y Stock',
-          'Finalización',
-        ]}
+        steps={['Información del Producto', 'Precios y Stock', 'Finalización']}
         onStepClick={(target) => target < step && setStep(target)}
       />
 
@@ -139,74 +121,6 @@ export default function ProductForm({
               <Input label="Precio" name="precio" type="number" value={formData.precio} onChange={handleChangeWrapper} />
               <Input label="Stock" name="stock" type="number" value={formData.stock} onChange={handleChangeWrapper} />
             </InputRowGrid>
-
-            <InputRowGrid>
-              <div className="mb-4">
-                <label className="block text-m font-medium text-gray-700 mb-0">¿Está en oferta?</label>
-                <div className="flex items-center gap-4">
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="oferta"
-                      value="true"
-                      checked={formData.oferta === true}
-                      onChange={handleChangeWrapper}
-                      className="mr-2"
-                    />
-                    Sí
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="oferta"
-                      value="false"
-                      checked={formData.oferta === false}
-                      onChange={handleChangeWrapper}
-                      className="mr-2"
-                    />
-                    No
-                  </label>
-                </div>
-              </div>
-
-              {formData.oferta && (
-                <Input
-                  label="Precio con Descuento"
-                  name="precio_descuento"
-                  type="number"
-                  value={formData.precio_descuento}
-                  onChange={handleChangeWrapper}
-                />
-              )}
-            </InputRowGrid>
-
-            <div className="mb-4">
-              <label className="block text-m font-medium text-gray-700 mb-0">¿Es destacado?</label>
-              <div className="flex items-center gap-4">
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="destacado"
-                    value="true"
-                    checked={formData.destacado === true}
-                    onChange={handleChangeWrapper}
-                    className="mr-2"
-                  />
-                  Sí
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="destacado"
-                    value="false"
-                    checked={formData.destacado === false}
-                    onChange={handleChangeWrapper}
-                    className="mr-2"
-                  />
-                  No
-                </label>
-              </div>
-            </div>
           </Step>
           <StepNavigation nextStep={handleNext} prevStep={prevStep} />
         </>
@@ -221,19 +135,12 @@ export default function ProductForm({
                 type="file"
                 accept="image/*"
                 multiple
-                onChange={async (e) => {
+                onChange={(e) => {
                   const files = Array.from(e.target.files);
-                  const toBase64 = file => new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(file);
-                  });
-                  const base64Images = await Promise.all(files.map(toBase64));
                   handleChange({
                     target: {
                       name: 'imagenes',
-                      value: [...formData.imagenes, ...base64Images],
+                      value: [...formData.imagenes, ...files],
                     },
                   });
                 }}

@@ -3,7 +3,7 @@ import TimePicker from './TimePicker';
 
 const daysOfWeek = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
 
-export default function ScheduleInput({ horarios, handleChange }) {
+export default function ScheduleInput({ horarios, handleChange, disabled }) {
   const handleHorarioChange = (day, field, value) => {
     const updatedHorarios = { ...horarios };
 
@@ -39,6 +39,7 @@ export default function ScheduleInput({ horarios, handleChange }) {
                 type="checkbox"
                 checked={horarios[day]?.activo || false}
                 onChange={(e) => handleHorarioChange(day, 'activo', e.target.checked)}
+                disabled={disabled}
               />
               <label className="font-medium capitalize">{day}</label>
             </div>
@@ -47,13 +48,13 @@ export default function ScheduleInput({ horarios, handleChange }) {
               <TimePicker
                 value={horarios[day]?.desde || '12:00'}
                 onChange={(value) => handleHorarioChange(day, 'desde', value)}
-                disabled={!horarios[day]?.activo}
-              />
+                disabled={disabled || !horarios[day]?.activo}
+                />
               <span className="text-gray-600 font-semibold">-</span>
               <TimePicker
                 value={horarios[day]?.hasta || '22:00'}
                 onChange={(value) => handleHorarioChange(day, 'hasta', value)}
-                disabled={!horarios[day]?.activo}
+                disabled={disabled || !horarios[day]?.activo}
               />
             </div>
           </div>
@@ -66,4 +67,5 @@ export default function ScheduleInput({ horarios, handleChange }) {
 ScheduleInput.propTypes = {
   horarios: PropTypes.object.isRequired,
   handleChange: PropTypes.func.isRequired,
+  disabled: PropTypes.bool,
 };

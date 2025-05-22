@@ -18,13 +18,12 @@ export default function EditProductPage() {
   useEffect(() => {
     async function fetchProduct() {
       try {
-        const product = await getProductById(tenantId, productId);
+        const product = await getProductById(productId);
         if (!product) return navigate(`/products/catalogue/${tenantId}`);
 
         // Parsear campos numéricos/booleanos si es necesario
         setFormData({
           ...product,
-          posee_descuento: Boolean(product.posee_descuento),
         });
       } catch {
         navigate(`/products/catalogue/${tenantId}`);
@@ -54,12 +53,15 @@ export default function EditProductPage() {
     e.preventDefault();
     setIsLoading(true);
     setError('');
-
+  
     try {
-      await updateProduct(tenantId, formData);
+      const cleanFormData = { ...formData };
+      delete cleanFormData.catalogo_id; // 💥 evitamos que dispare la lógica del catálogo
+  
+      await updateProduct(tenantId, cleanFormData);
       setShowModal(true);
     } catch (err) {
-      console.error(err);
+      console.error('Error actualizando producto:', err);
       setError('❌ Error al actualizar el producto');
     } finally {
       setIsLoading(false);

@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import mockTenants from '../mocks/mockTenants';
+import { getAllProducts } from '../apis/ProductsService';
 import ButtonAdd from '../components/ButtonAdd';
 import SearchInput from '../components/SearchInput';
 import ProductTable from '../components/ProductTable';
 import ColumnSelector from '../components/ColumnSelector';
 
 export default function ProductsCatalogue() {
-  const { tenantId } = useParams();
   const navigate = useNavigate();
 
   const [tenant, setTenant] = useState(null);
@@ -35,7 +34,6 @@ export default function ProductsCatalogue() {
     'categoria',
     'estado',
     'oferta',
-    'destacado',
     'fecha_creacion',
     'fecha_actualizacion',
     'acciones',
@@ -52,17 +50,51 @@ export default function ProductsCatalogue() {
     categoria: 'Categoría',
     estado: 'Estado',
     oferta: '¿En oferta?',
-    destacado: '¿Destacado?',
     fecha_creacion: 'Fecha de Creación',
     fecha_actualizacion: 'Fecha de Actualización',
     acciones: 'Acciones',
   };
+
+  const calcularPrecioConDescuento = (precioOriginal, promo) => {
+    if (!promo) return null;
+    if (promo.tipo_promocion === 'porcentaje') {
+      return precioOriginal - (precioOriginal * promo.valor_descuento) / 100;
+    } else if (promo.tipo_promocion === 'monto') {
+      return precioOriginal - promo.valor_descuento;
+    }
+    return null;
+  };
   
   useEffect(() => {
-    const selected = mockTenants.find((t) => t.tenant_id === Number(tenantId));
-    if (!selected) return navigate('/products/select-tenant');
-    setTenant(selected);
-  }, [tenantId, navigate]);
+    const fetchProducts = async () => {
+      try {
+        const products = await getAllProducts();
+        setTenant({
+          tenant_id: 1,
+          nombre: 'Nombre del Comercio', // opcional si querés hardcodearlo
+          productos: products.map((p) => ({
+            id: parseInt(p.producto_id),
+            nombre: p.nombre_producto,
+            descripcion: p.descripcion,
+            precio: p.precio,
+            precio_descuento: p.promociones?.length
+              ? calcularPrecioConDescuento(p.precio, p.promociones[0])
+              : null,
+            stock: p.cantidad_stock,
+            categoria: p.categoria?.nombre || '',
+            imagenes: p.imagenes || [],
+            oferta: !!p.promociones?.length,
+            fecha_creacion: '', // completar si se desea
+            fecha_actualizacion: '', // completar si se desea
+          })),
+        });
+      } catch (err) {
+        console.error('Error cargando productos:', err);
+      }
+    };
+  
+    fetchProducts();
+  }, []);
 
   const filteredProducts = tenant?.productos?.filter((p) =>
     p.nombre.toLowerCase().includes(searchTerm.toLowerCase())
@@ -76,7 +108,7 @@ export default function ProductsCatalogue() {
     console.log('Eliminar', product);
   };
 
-  const handleChangeTenant = () => navigate('/products/select-tenant');
+  const handleChangeTenant = () => navigate('/products');
 
   if (!tenant) return null;
 

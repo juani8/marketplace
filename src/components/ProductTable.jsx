@@ -54,7 +54,6 @@ export default function ProductTable({ products, visibleColumns, onEdit, onDelet
               {visibleColumns.includes('estado') && (<th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Estado</th>)}
               {visibleColumns.includes('stock') && (<th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Stock</th>)}
               {visibleColumns.includes('oferta') && (<th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">¿En oferta?</th>)}
-              {visibleColumns.includes('destacado') && (<th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">¿Destacado?</th>)}
               {visibleColumns.includes('fecha_creacion') && (<th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Creación</th>)}
               {visibleColumns.includes('fecha_actualizacion') && (<th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Actualización</th>)}
               {visibleColumns.includes('acciones') && (<th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Acciones</th>)}
@@ -94,7 +93,6 @@ export default function ProductTable({ products, visibleColumns, onEdit, onDelet
                 )}
                 {visibleColumns.includes('stock') && (<td className="py-2 px-4">{producto.stock}</td>)}
                 {visibleColumns.includes('oferta') && (<td className="py-2 px-4">{producto.oferta ? 'Sí' : 'No'}</td>)}
-                {visibleColumns.includes('destacado') && (<td className="py-2 px-4">{producto.destacado ? 'Sí' : 'No'}</td>)}
                 {visibleColumns.includes('fecha_creacion') && (<td className="py-2 px-4">{producto.fecha_creacion}</td>)}
                 {visibleColumns.includes('fecha_actualizacion') && (<td className="py-2 px-4">{producto.fecha_actualizacion}</td>)}
                 {visibleColumns.includes('acciones') && (
@@ -194,11 +192,6 @@ export default function ProductTable({ products, visibleColumns, onEdit, onDelet
               {visibleColumns.includes('oferta') && (
                 <div className="mb-2">
                   <span className="font-semibold">Oferta:</span> {producto.oferta ? 'Sí' : 'No'}
-                </div>
-              )}
-              {visibleColumns.includes('destacado') && (
-                <div className="mb-2">
-                  <span className="font-semibold">Destacado:</span> {producto.destacado ? 'Sí' : 'No'}
                 </div>
               )}
               {visibleColumns.includes('fecha_creacion') && (

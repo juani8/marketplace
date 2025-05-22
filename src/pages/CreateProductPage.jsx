@@ -1,22 +1,20 @@
 import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import ProductForm from '../components/ProductForm';
 import SuccessModal from '../components/SuccessModal';
 import { createProduct } from '../apis/productsService';
 
 export default function CreateProductPage() {
   const navigate = useNavigate();
-  const { tenantId } = useParams();
+  const tenantId = 1;
+
 
   const [formData, setFormData] = useState({
     nombre: '',
     descripcion: '',
     categoria: '',
     precio: '',
-    precio_descuento: '',
     stock: '',
-    oferta: false,
-    destacado: false,
     imagenes: [],
   });
   const [step, setStep] = useState(1);
@@ -83,7 +81,7 @@ export default function CreateProductPage() {
       <div className="mt-4">
         <button
           type="button"
-          onClick={() => navigate(`/products/catalogue/${tenantId}`)}
+          onClick={() => navigate(`/products`)}
           className="text-sm text-gray-500 hover:text-gray-700 underline"
         >
           Cancelar y volver al catálogo

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://marketplace-services-v8vn.onrender.com/api', // 
+  baseURL: import.meta.env.VITE_API_BASE_URL, // 
   withCredentials: true,
 });
 

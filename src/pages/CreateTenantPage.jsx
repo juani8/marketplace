@@ -11,7 +11,6 @@ export default function CreateTenantPage() {
     razon_social: '',
     cuenta_bancaria: '',
     datos_contacto: { email: '', tel: '' },
-    posee_direccion: false,
     direccion: {
       calle: '',
       numero: '',
@@ -31,9 +30,7 @@ export default function CreateTenantPage() {
         sábado: { activo: false, desde: '', hasta: '' },
         domingo: { activo: false, desde: '', hasta: '' },
       },
-      tipo_servicio: 'envio',
     },
-    catalogo_id: '',
     estado: 'activo',
   });
 

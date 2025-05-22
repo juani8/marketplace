@@ -20,20 +20,8 @@ export default function TenantForm({
   showErrors,
   setShowErrors,
   isLoading,
+  isEditing,
 }) {
-  TenantForm.propTypes = {
-    formData: PropTypes.object.isRequired,
-    handleChange: PropTypes.func.isRequired,
-    handleSubmit: PropTypes.func.isRequired,
-    step: PropTypes.number.isRequired,
-    setStep: PropTypes.func.isRequired,
-    nextStep: PropTypes.func.isRequired,
-    prevStep: PropTypes.func.isRequired,
-    error: PropTypes.string,
-    showErrors: PropTypes.bool.isRequired,
-    setShowErrors: PropTypes.func.isRequired,
-    isLoading: PropTypes.bool.isRequired,
-  };
   
   const [validationErrors, setValidationErrors] = useState([]);
 
@@ -43,7 +31,7 @@ export default function TenantForm({
 
   const validateStep = () => {
     const errors = [];
-
+  
     if (step === 1) {
       if (!formData.nombre.trim()) errors.push('El campo Nombre es obligatorio.');
       if (!formData.razon_social.trim()) errors.push('El campo Razón Social es obligatorio.');
@@ -53,47 +41,45 @@ export default function TenantForm({
         errors.push('El campo Cuenta Bancaria debe tener exactamente 22 dígitos.');
       }
     }
-
+  
     if (step === 2) {
       if (!formData.datos_contacto.email.trim()) {
         errors.push('El campo Email es obligatorio.');
       } else if (!validateEmail(formData.datos_contacto.email)) {
         errors.push('El campo Email no es válido.');
       }
-      if (!formData.datos_contacto.tel.trim()) errors.push('El campo Teléfono es obligatorio.');
-      if (formData.posee_direccion) {
-        const { calle, numero, ciudad, provincia, codigo_postal } = formData.direccion;
     
-        if (!calle.trim()) errors.push('El campo Calle es obligatorio.');
-        if (!numero.trim()) errors.push('El campo Número es obligatorio.');
-        if (!ciudad.trim()) errors.push('El campo Ciudad es obligatorio.');
-        if (!provincia.trim()) errors.push('El campo Provincia es obligatorio.');
-        if (!codigo_postal.trim()) errors.push('El campo Código Postal es obligatorio.');
+      if (!formData.datos_contacto.tel.trim()) {
+        errors.push('El campo Teléfono es obligatorio.');
       }
+    
+      if (!formData.calle.trim()) errors.push('El campo Calle es obligatorio.');
+      if (!formData.numero.trim()) errors.push('El campo Número es obligatorio.');
+      if (!formData.ciudad.trim()) errors.push('El campo Ciudad es obligatorio.');
+      if (!formData.provincia.trim()) errors.push('El campo Provincia es obligatorio.');
+      if (!formData.codigo_postal.trim()) errors.push('El campo Código Postal es obligatorio.');
     }
     
     if (step === 3) {
-      const horarios = formData.configuracion_operativa.horarios;
-      const diasActivos = Object.keys(horarios).filter(day => horarios[day].activo);
-      if (diasActivos.length === 0) errors.push('Debes configurar al menos un horario de atención.');
-
-      diasActivos.forEach((day) => {
-        const { desde, hasta } = horarios[day];
-        if (!desde || !hasta) {
-          errors.push(`Debes completar ambos horarios para ${day}.`);
-        } else if (isInvalidRange(desde, hasta)) {
-          errors.push(`La apertura debe ser anterior al cierre en ${day}.`);
-        }
-      });
-
-      if (!formData.configuracion_operativa.tipo_servicio.trim()) errors.push('El campo Tipo de Servicio es obligatorio.');
-      if (!formData.catalogo_id.trim()) errors.push('El campo Catálogo ID es obligatorio.');
-      if (!formData.estado.trim()) errors.push('El campo Estado es obligatorio.');
+      if (!formData.horario_apertura) {
+        errors.push('El campo Horario de Apertura es obligatorio.');
+      }
+      if (!formData.horario_cierre) {
+        errors.push('El campo Horario de Cierre es obligatorio.');
+      }
+      if (formData.horario_apertura && formData.horario_cierre && formData.horario_apertura >= formData.horario_cierre) {
+        errors.push('La hora de apertura debe ser anterior a la de cierre.');
+      }
+      if (!formData.estado.trim()) {
+        errors.push('El campo Estado es obligatorio.');
+      }
     }
-
+  
     setValidationErrors(errors);
     return errors.length === 0;
   };
+  
+  
 
   const handleNext = () => {
     setShowErrors(true);
@@ -127,14 +113,6 @@ export default function TenantForm({
     };
   
     const value = getValue(fieldName);
-  
-    const isDireccionField = fieldName.startsWith('direccion.');
-    const isGeocodeError =
-      error === 'La dirección ingresada no es válida o no se pudo geolocalizar.';
-  
-    if (isDireccionField && isGeocodeError) {
-      return true; // 🔴 Fuerza el borde rojo en todos los campos de dirección
-    }
   
     return value === '' || value === undefined || value === null;
   };
@@ -178,6 +156,7 @@ export default function TenantForm({
                 value={formData.nombre}
                 onChange={handleChange}
                 hasError={hasErrors('nombre')}
+                disabled={!isEditing}
               />
               <Input
                 label="Razón Social"
@@ -185,6 +164,7 @@ export default function TenantForm({
                 value={formData.razon_social}
                 onChange={handleChange}
                 hasError={hasErrors('razon_social')}
+                disabled={!isEditing}
               />
             </InputRowGrid>
 
@@ -195,6 +175,7 @@ export default function TenantForm({
                 value={formData.cuenta_bancaria}
                 onChange={handleChange}
                 hasError={hasErrors('cuenta_bancaria')}
+                disabled={!isEditing}
               />
             </div>
           </Step>
@@ -213,6 +194,7 @@ export default function TenantForm({
                 value={formData.datos_contacto.email}
                 onChange={handleChange}
                 hasError={hasErrors('datos_contacto.email')}
+                disabled={!isEditing}
               />
               <Input
                 label="Teléfono"
@@ -220,77 +202,53 @@ export default function TenantForm({
                 value={formData.datos_contacto.tel}
                 onChange={handleChange}
                 hasError={hasErrors('datos_contacto.tel')}
+                disabled={!isEditing}
               />
             </InputRowGrid>
 
             <div className="grid grid-cols-1 gap-4 mt-4">
-              <div className="mt-4">
-                <label className="block text-m font-medium text-gray-700 mb-0">¿Posee dirección física?</label>
-                <div className="flex items-center gap-4">
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="posee_direccion"
-                      value="true"
-                      checked={formData.posee_direccion === true}
-                      onChange={() => handleChange({ target: { name: 'posee_direccion', value: true, type: 'radio' } })}
-                      className="mr-2"
-                    />
-                    Sí
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      name="posee_direccion"
-                      value="false"
-                      checked={formData.posee_direccion === false}
-                      onChange={() => handleChange({ target: { name: 'posee_direccion', value: false, type: 'radio' } })}
-                      className="mr-2"
-                    />
-                    No
-                  </label>
-                </div>
-              </div>
-
-              {formData.posee_direccion && (
                 <InputRowGrid>
                   <Input
                     label="Calle"
-                    name="direccion.calle"
-                    value={formData.direccion.calle}
+                    name="calle"
+                    value={formData.calle}
                     onChange={handleChange}
-                    hasError={hasErrors('direccion.calle')}
+                    hasError={hasErrors('calle')}
+                    disabled={!isEditing}
                   />
                   <Input
                     label="Número"
-                    name="direccion.numero"
-                    value={formData.direccion.numero}
+                    name="numero"
+                    value={formData.numero}
                     onChange={handleChange}
-                    hasError={hasErrors('direccion.numero')}
+                    hasError={hasErrors('numero')}
+                    disabled={!isEditing}
                   />
                   <Input
                     label="Ciudad"
-                    name="direccion.ciudad"
-                    value={formData.direccion.ciudad}
+                    name="ciudad"
+                    value={formData.ciudad}
                     onChange={handleChange}
-                    hasError={hasErrors('direccion.ciudad')}
+                    hasError={hasErrors('ciudad')}
+                    disabled={!isEditing}
                   />
                   <Input
                     label="Provincia"
-                    name="direccion.provincia"
-                    value={formData.direccion.provincia}
+                    name="provincia"
+                    value={formData.provincia}
                     onChange={handleChange}
-                    hasError={hasErrors('direccion.provincia')}
+                    hasError={hasErrors('provincia')}
+                    disabled={!isEditing}
                   />
                   <Input
                     label="Código Postal"
-                    name="direccion.codigo_postal"
-                    value={formData.direccion.codigo_postal}
+                    name="codigo_postal"
+                    value={formData.codigo_postal}
                     onChange={handleChange}
-                    hasError={hasErrors('direccion.codigo_postal')}
+                    hasError={hasErrors('codigo_postal')}
+                    disabled={!isEditing}
                   />
                 </InputRowGrid>
-              )}
             </div>
           </Step>
           <StepNavigation nextStep={handleNext} prevStep={handlePrev} />
@@ -303,30 +261,29 @@ export default function TenantForm({
           <Step title="Configuración y Finalización">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-2">
               {/* Columna de Horarios */}
-              <div>
-                <ScheduleInput
-                  horarios={formData.configuracion_operativa.horarios}
-                  handleChange={handleChange}
+              <InputRowGrid>
+                <Input
+                  label="Horario de Apertura"
+                  name="horario_apertura"
+                  type="time"
+                  value={formData.horario_apertura}
+                  onChange={handleChange}
+                  hasError={hasErrors('horario_apertura')}
+                  disabled={!isEditing}
                 />
-              </div>
+                <Input
+                  label="Horario de Cierre"
+                  name="horario_cierre"
+                  type="time"
+                  value={formData.horario_cierre}
+                  onChange={handleChange}
+                  hasError={hasErrors('horario_cierre')}
+                  disabled={!isEditing}
+                />
+              </InputRowGrid>
 
               {/* Columna de configuración */}
               <div className="space-y-4">
-                <Select
-                  label="Tipo de Servicio"
-                  name="configuracion_operativa.tipo_servicio"
-                  value={formData.configuracion_operativa.tipo_servicio}
-                  onChange={handleChange}
-                  options={['envio', 'retiro', 'ambos']}
-                  hasError={hasErrors('configuracion_operativa.tipo_servicio')}
-                />
-                <Input
-                  label="Catálogo ID"
-                  name="catalogo_id"
-                  value={formData.catalogo_id}
-                  onChange={handleChange}
-                  hasError={hasErrors('catalogo_id')}
-                />
                 <Select
                   label="Estado"
                   name="estado"
@@ -334,13 +291,14 @@ export default function TenantForm({
                   onChange={handleChange}
                   options={['activo', 'inactivo']}
                   hasError={hasErrors('estado')}
+                  disabled={!isEditing}
                 />
               </div>
             </div>
           </Step>
           
 
-          <div className="flex justify-between items-center mt-6">
+          <div className="flex justify-start mt-6">
             <button
               type="button"
               onClick={handlePrev}
@@ -348,24 +306,24 @@ export default function TenantForm({
             >
               Anterior
             </button>
-
-            <button
-              type="submit"
-              className="bg-primary hover:bg-primary/90 text-white py-2 px-4 rounded flex items-center justify-center gap-2 disabled:opacity-50"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  Cargando
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                </>
-              ) : (
-                'Finalizar'
-              )}
-            </button>
           </div>
         </>
       )}
     </form>
   );
 }
+
+TenantForm.propTypes = {
+  formData: PropTypes.object.isRequired,
+  handleChange: PropTypes.func.isRequired,
+  handleSubmit: PropTypes.func.isRequired,
+  step: PropTypes.number.isRequired,
+  setStep: PropTypes.func.isRequired,
+  nextStep: PropTypes.func.isRequired,
+  prevStep: PropTypes.func.isRequired,
+  error: PropTypes.string,
+  showErrors: PropTypes.bool.isRequired,
+  setShowErrors: PropTypes.func.isRequired,
+  isLoading: PropTypes.bool.isRequired,
+  isEditing: PropTypes.bool.isRequired,
+};

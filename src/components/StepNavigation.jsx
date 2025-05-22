@@ -31,7 +31,7 @@ export default function StepNavigation({ nextStep, prevStep, isLast, handleFinal
         <button
           type="button"
           onClick={nextStep}
-          className="bg-primary hover:bg-blue-700 text-white py-2 px-4 rounded"
+          className="bg-gray-300 hover:bg-gray-400 text-neutral py-2 px-4 rounded"
           disabled={isLoading}
         >
           Siguiente
