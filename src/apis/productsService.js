@@ -68,17 +68,7 @@ export const updateProduct = async (tenantId, formData) => {
 
 
 // Eliminar producto
-export const deleteProduct = async (tenantId, productId) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const tenant = mockTenants.find((t) => t.tenant_id === parseInt(tenantId));
-      if (!tenant) return reject(new Error('Tenant no encontrado'));
-
-      const index = tenant.productos.findIndex((p) => p.id === parseInt(productId));
-      if (index === -1) return reject(new Error('Producto no encontrado'));
-
-      tenant.productos.splice(index, 1);
-      resolve();
-    }, 500);
-  });
+export const deleteProduct = async (productId) => {
+  const response = await api.delete(`/products/${productId}`);
+  return response.data;
 };

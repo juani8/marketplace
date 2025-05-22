@@ -20,6 +20,7 @@ export default function ProductForm({
   showErrors,
   setShowErrors,
   isLoading,
+  categories
 }) {
   const [validationErrors, setValidationErrors] = useState([]);
 
@@ -54,7 +55,10 @@ export default function ProductForm({
         parsedValue = parseInt(parsedValue);
         if (!Number.isInteger(parsedValue)) return;
       }
-
+      if (name === 'categoria') {
+        handleChange({ target: { name, value: Number(value) } });
+        return;
+      }
       handleChange({ target: { name, value: parsedValue } });
     } else {
       handleChange(e);
@@ -106,7 +110,14 @@ export default function ProductForm({
           <Step title="Información del Producto">
             <InputRowGrid>
               <Input label="Nombre" name="nombre" value={formData.nombre} onChange={handleChangeWrapper} />
-              <Input label="Categoría" name="categoria" value={formData.categoria} onChange={handleChangeWrapper} />
+              <Select
+                label="Categoría"
+                name="categoria"
+                value={formData.categoria}
+                onChange={handleChangeWrapper}
+                options={categories}
+                hasError={showErrors && !formData.categoria}
+              />
             </InputRowGrid>
             <Input label="Descripción" name="descripcion" value={formData.descripcion} onChange={handleChangeWrapper} />
           </Step>
@@ -196,4 +207,5 @@ ProductForm.propTypes = {
   showErrors: PropTypes.bool.isRequired,
   setShowErrors: PropTypes.func.isRequired,
   isLoading: PropTypes.bool.isRequired,
+  categories: PropTypes.array.isRequired, 
 };
