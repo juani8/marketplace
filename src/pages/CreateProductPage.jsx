@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProductForm from '../components/ProductForm';
 import SuccessModal from '../components/SuccessModal';
 import { createProduct } from '../apis/productsService';
+import { getAllCategories } from '../apis/categoriesService';
 
 export default function CreateProductPage() {
   const navigate = useNavigate();
@@ -22,6 +23,8 @@ export default function CreateProductPage() {
   const [showErrors, setShowErrors] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
+
+  const [categories, setCategories] = useState([]);
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
@@ -55,6 +58,23 @@ export default function CreateProductPage() {
     }
   };
 
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const res = await getAllCategories(); // suponiendo que esto devuelve el array
+        const formatted = res.map((cat) => ({
+          value: String(cat.categoria_id),
+          label: cat.nombre,
+        }));
+        setCategories(formatted);
+      } catch (err) {
+        console.error('Error cargando categorías:', err);
+      }
+    }
+  
+    fetchCategories();
+  }, []);
+
   const nextStep = () => setStep((prev) => prev + 1);
   const prevStep = () => setStep((prev) => prev - 1);
 
@@ -76,6 +96,7 @@ export default function CreateProductPage() {
         showErrors={showErrors}
         setShowErrors={setShowErrors}
         isLoading={isLoading}
+        categories={categories}
       />
 
       <div className="mt-4">
@@ -92,7 +113,7 @@ export default function CreateProductPage() {
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         successMessage="¡Producto creado exitosamente!"
-        redirectTo={`/products/catalogue/${tenantId}`}
+        redirectTo={`/products`}
         buttonText="Volver al Catálogo"
       />
     </div>
