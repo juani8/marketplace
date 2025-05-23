@@ -33,15 +33,6 @@ export default function Sidebar({ isCollapsed, toggleSidebar }) {
 
       {/* Navegación */}
       <nav className="flex-1 flex flex-col gap-2 px-2">
-        <Link
-          to="/dashboard"
-          className={`flex items-center gap-3 px-2 py-2 rounded hover:bg-blue-600 ${
-            isActive('/dashboard') ? 'bg-blue-700' : ''
-          }`}
-        >
-          <FaTachometerAlt className="text-xl" />
-          {!isCollapsed && <span>Dashboard</span>}
-        </Link>
 
         <Link
           to="/perfil"
