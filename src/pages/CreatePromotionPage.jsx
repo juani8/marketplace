@@ -9,7 +9,9 @@ export default function CreatePromotionPage() {
     nombre: '',
     tipo_promocion: '',
     valor_descuento: '',
-    productos_incluidos: [],
+    lista_productos: [],
+    fecha_inicio: '',
+    fecha_fin: '',
   });
   const [error, setError] = useState('');
   const [showErrors, setShowErrors] = useState(false);

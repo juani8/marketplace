@@ -1,28 +1,22 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAllProducts } from '../apis/productsService';
+import { getAllPromotions, deletePromotion } from '../apis/promotionsService';
 import ButtonAdd from '../components/ButtonAdd';
+import PromotionsTable from '../components/PromotionsTable';
+import SuccessModal from '../components/SuccessModal'; // 👈 agregá esto
 
 export default function PromotionsPage() {
   const [promociones, setPromociones] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchPromos() {
       try {
-        const productos = await getAllProducts();
-
-        const promosUnicas = [];
-        productos.forEach((p) => {
-          p.promociones.forEach((promo) => {
-            if (!promosUnicas.some((x) => x.promocion_id === promo.promocion_id)) {
-              promosUnicas.push(promo);
-            }
-          });
-        });
-
-        setPromociones(promosUnicas);
+        const promos = await getAllPromotions();
+        setPromociones(promos);
       } catch (err) {
         console.error('Error al cargar promociones:', err);
       } finally {
@@ -33,7 +27,25 @@ export default function PromotionsPage() {
     fetchPromos();
   }, []);
 
-  // ⏳ Mostrar loading mientras se cargan
+  const handleEdit = (promo) => {
+    navigate(`/promociones/edit/${promo.promocion_id}`);
+  };
+
+  const handleDelete = async (promo) => {
+    const confirm = window.confirm(`¿Estás seguro que querés eliminar "${promo.nombre}"?`);
+    if (!confirm) return;
+
+    try {
+      await deletePromotion(promo.promocion_id);
+      setPromociones((prev) => prev.filter(p => p.promocion_id !== promo.promocion_id));
+      setSuccessMessage(`"${promo.nombre}" eliminada correctamente`);
+      setShowModal(true);
+    } catch (err) {
+      console.error('❌ Error al eliminar promoción:', err);
+      alert('No se pudo eliminar la promoción');
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -47,24 +59,23 @@ export default function PromotionsPage() {
 
   return (
     <div className="p-6">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0 mb-4">
         <h1 className="text-2xl font-bold text-gray-800">Promociones</h1>
-        <ButtonAdd
-          onClick={() => navigate(`/promociones/create`)}
-          text="Añadir Producto"
-        />
+        <ButtonAdd onClick={() => navigate(`/promociones/create`)} text="Añadir Promoción" />
       </div>
 
-      <div className="grid gap-4">
-        {promociones.map((promo) => (
-          <div key={promo.promocion_id} className="bg-white p-4 rounded shadow">
-            <p><strong>Nombre:</strong> {promo.nombre}</p>
-            <p><strong>Tipo:</strong> {promo.tipo_promocion}</p>
-            <p><strong>Descuento:</strong> {promo.valor_descuento}</p>
-            <p><strong>Productos:</strong> {promo.productos_incluidos.join(', ')}</p>
-          </div>
-        ))}
-      </div>
+      <PromotionsTable
+        promotions={promociones}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
+
+      <SuccessModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        successMessage={successMessage}
+        redirectTo="/promociones"
+      />
     </div>
   );
 }
