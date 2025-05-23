@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import PromotionForm from '../components/PromotionForm';
 import SuccessModal from '../components/SuccessModal';
 import { getAllPromotions, updatePromotion } from '../apis/promotionsService';
 
 export default function EditPromotionPage() {
-  const { id } = useParams(); // 👈 asegurate que el path use :id
+  const { id } = useParams();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState(null);
@@ -13,35 +13,48 @@ export default function EditPromotionPage() {
   const [error, setError] = useState('');
   const [showErrors, setShowErrors] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [originalFormData, setOriginalFormData] = useState(null);
+  const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
     const fetchPromotion = async () => {
-      try {
-        const allPromos = await getAllPromotions();
-        const promo = allPromos.find(p => p.promocion_id === parseInt(id));
-        if (!promo) {
-          setError('Promoción no encontrada.');
-          return;
+        try {
+          const allPromos = await getAllPromotions();
+          const promo = allPromos.find(p => p.promocion_id === parseInt(id));
+          if (!promo) {
+            setError('Promoción no encontrada.');
+            return;
+          }
+      
+          const promotionData = {
+            nombre: promo.nombre,
+            tipo_promocion: promo.tipo_promocion,
+            valor_descuento: parseFloat(promo.valor_descuento),
+            lista_productos: promo.productos?.map(p => String(p.producto_id)) || [],
+            fecha_inicio: promo.fecha_inicio?.split('T')[0] || '',
+            fecha_fin: promo.fecha_fin?.split('T')[0] || '',
+          };
+      
+          setFormData(promotionData);
+          setOriginalFormData(promotionData);
+        } catch (err) {
+          console.error('Error al cargar promoción:', err);
+          setError('No se pudo cargar la promoción.');
+        } finally {
+          setIsLoading(false);
         }
-
-        setFormData({
-          nombre: promo.nombre,
-          tipo_promocion: promo.tipo_promocion,
-          valor_descuento: parseFloat(promo.valor_descuento),
-          lista_productos: promo.productos?.map(p => String(p.producto_id)) || [],
-          fecha_inicio: promo.fecha_inicio?.split('T')[0] || '',
-          fecha_fin: promo.fecha_fin?.split('T')[0] || '',
-        });
-      } catch (err) {
-        console.error('Error al cargar promoción:', err);
-        setError('No se pudo cargar la promoción.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
+      };      
 
     fetchPromotion();
   }, [id]);
+
+  useEffect(() => {
+    if (formData && originalFormData) {
+      const changed = JSON.stringify(formData) !== JSON.stringify(originalFormData);
+      setHasChanges(changed);
+    }
+  }, [formData, originalFormData]);
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -56,6 +69,7 @@ export default function EditPromotionPage() {
     setError('');
     try {
       await updatePromotion(id, formData);
+      setOriginalFormData({ ...formData });
       setShowModal(true);
     } catch (err) {
       console.error('Error al actualizar la promoción:', err);
@@ -64,6 +78,7 @@ export default function EditPromotionPage() {
       setIsLoading(false);
     }
   };
+  
 
   if (isLoading || !formData) {
     return (
@@ -87,11 +102,15 @@ export default function EditPromotionPage() {
         showErrors={showErrors}
         setShowErrors={setShowErrors}
         isLoading={isLoading}
+        hasChanges={hasChanges}
         editingPromotionId={parseInt(id)}
       />
       <SuccessModal
         isOpen={showModal}
-        onClose={() => setShowModal(false)}
+        onClose={() => {
+            setShowModal(false);
+            navigate('/promociones');
+        }}
         successMessage="¡Promoción actualizada exitosamente!"
         redirectTo="/promociones"
         buttonText="Volver a listado"

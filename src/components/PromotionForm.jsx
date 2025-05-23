@@ -15,6 +15,7 @@ export default function PromotionForm({
   showErrors,
   setShowErrors,
   isLoading,
+  hasChanges,
   editingPromotionId = null,
 }) {
   const [validationErrors, setValidationErrors] = useState([]);
@@ -290,8 +291,18 @@ const productosDisponibles = products.filter((p) => {
       </div>
 
       <div className="flex justify-end">
-        <Button type="submit" loading={isLoading} disabled={isLoading}>
-          {editingPromotionId ? 'Guardar Cambios' : 'Crear Promoción'}
+        <Button
+          type="submit"
+          loading={isLoading}
+          disabled={isLoading || (editingPromotionId !== null && !hasChanges)}
+        >
+          {isLoading
+            ? editingPromotionId
+              ? 'Guardando...'
+              : 'Creando...'
+            : editingPromotionId
+            ? 'Guardar Cambios'
+            : 'Crear Promoción'}
         </Button>
       </div>
     </form>
@@ -306,5 +317,6 @@ PromotionForm.propTypes = {
   showErrors: PropTypes.bool.isRequired,
   setShowErrors: PropTypes.func.isRequired,
   isLoading: PropTypes.bool.isRequired,
+  hasChanges: PropTypes.bool.isRequired,
   editingPromotionId: PropTypes.number,
 };

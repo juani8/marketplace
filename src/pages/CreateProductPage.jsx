@@ -75,6 +75,16 @@ export default function CreateProductPage() {
     fetchCategories();
   }, []);
 
+  const isFormValid = () => {
+    return (
+      formData.nombre.trim() &&
+      formData.descripcion.trim() &&
+      formData.categoria &&
+      formData.precio > 0 &&
+      formData.stock >= 0
+    );
+  };
+
   const nextStep = () => setStep((prev) => prev + 1);
   const prevStep = () => setStep((prev) => prev - 1);
 
@@ -97,6 +107,7 @@ export default function CreateProductPage() {
         setShowErrors={setShowErrors}
         isLoading={isLoading}
         categories={categories}
+        hasChanges={isFormValid()}
       />
 
       <div className="mt-4">
@@ -111,7 +122,10 @@ export default function CreateProductPage() {
 
       <SuccessModal
         isOpen={showModal}
-        onClose={() => setShowModal(false)}
+        onClose={() => {
+          setShowModal(false);
+          navigate('/productos');
+      }}
         successMessage="¡Producto creado exitosamente!"
         redirectTo={`/products`}
         buttonText="Volver al Catálogo"

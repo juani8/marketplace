@@ -142,7 +142,10 @@ export default function EditProductPage() {
 
       <SuccessModal
         isOpen={showModal}
-        onClose={() => setShowModal(false)}
+        onClose={() => {
+          setShowModal(false);
+          navigate('/products');
+      }}
         successMessage="¡Producto modificado exitosamente!"
         redirectTo={`/products`}
         buttonText="Volver al Catálogo"
