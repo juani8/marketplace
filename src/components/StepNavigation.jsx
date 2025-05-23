@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 
-export default function StepNavigation({ nextStep, prevStep, isLast, handleFinalSubmit, isLoading }) {
+export default function StepNavigation({ nextStep, prevStep, isLast, handleFinalSubmit, isLoading, hasChanges }) {
   return (
-    <div className="flex justify-between mt-6">
+    <div className="flex justify-between gap-4v} mt-6">
       {prevStep ? (
         <button
           type="button"
@@ -18,13 +18,16 @@ export default function StepNavigation({ nextStep, prevStep, isLast, handleFinal
         <button
           type="button"
           onClick={handleFinalSubmit}
-          className={`flex justify-center items-center gap-2 bg-primary hover:bg-blue-700 text-white py-2 px-4 rounded ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-          disabled={isLoading}
+          className={`bg-primary hover:bg-blue-700 text-white py-2 px-4 rounded ${
+            isLoading || !hasChanges ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
+          disabled={isLoading || !hasChanges}
+          title={!hasChanges ? 'No realizaste cambios' : undefined}
         >
           {isLoading ? (
             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
           ) : (
-            "Finalizar"
+            'Finalizar'
           )}
         </button>
       ) : (
@@ -47,4 +50,5 @@ StepNavigation.propTypes = {
   isLast: PropTypes.bool,
   handleFinalSubmit: PropTypes.func,
   isLoading: PropTypes.bool,
+  hasChanges: PropTypes.bool,
 };
