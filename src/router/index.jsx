@@ -6,6 +6,7 @@ import EditProductPage from '../pages/EditProductPage';
 import CreateProductPage from '../pages/CreateProductPage';
 import PromotionsPage from '../pages/PromotionsPage';
 import CreatePromotionPage from '../pages/CreatePromotionPage';
+import EditPromotionPage from '../pages/EditPromotionPage';
 import PrivateLayout from '../layouts/PrivateLayout';
 import PublicLayout from '../layouts/PublicLayout'; 
 
@@ -27,6 +28,7 @@ export default function AppRouter() {
           <Route path="/products/edit/:tenantId/:productId" element={<EditProductPage />} />
           <Route path="/promociones" element={<PromotionsPage />} />
           <Route path="/promociones/create" element={<CreatePromotionPage />} />
+          <Route path="/promociones/edit/:id" element={<EditPromotionPage />} />
         </Route>
 
       </Routes>
