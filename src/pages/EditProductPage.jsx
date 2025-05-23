@@ -10,22 +10,29 @@ export default function EditProductPage() {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState(null);
+  const [originalFormData, setOriginalFormData] = useState(null);
+  const [hasChanges, setHasChanges] = useState(false);
+  const [noChangesNotice, setNoChangesNotice] = useState(false);
+
   const [step, setStep] = useState(1);
   const [error, setError] = useState('');
   const [showErrors, setShowErrors] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-    async function fetchData() {
+    const fetchData = async () => {
       try {
         const [product, allCategories] = await Promise.all([
           getProductById(productId),
           getAllCategories()
         ]);
 
-        if (!product) return navigate(`/products/catalogue/${tenantId}`);
+        if (!product) {
+          navigate(`/products/catalogue/${tenantId}`);
+          return;
+        }
 
         const formattedCategories = allCategories.map((cat) => ({
           value: String(cat.categoria_id),
@@ -33,15 +40,25 @@ export default function EditProductPage() {
         }));
 
         setFormData({ ...product });
+        setOriginalFormData({ ...product });
         setCategories(formattedCategories);
       } catch (err) {
-        console.error('Error al cargar datos:', err);
-        navigate(`/products/catalogue/${tenantId}`);
+        console.error('Error al cargar producto:', err);
+        setError('No se pudo cargar el producto.');
+      } finally {
+        setIsLoading(false);
       }
-    }
+    };
 
     fetchData();
   }, [tenantId, productId, navigate]);
+
+  useEffect(() => {
+    if (formData && originalFormData) {
+      const isDifferent = JSON.stringify(formData) !== JSON.stringify(originalFormData);
+      setHasChanges(isDifferent);
+    }
+  }, [formData, originalFormData]);
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
@@ -64,11 +81,18 @@ export default function EditProductPage() {
     setError('');
 
     try {
+      if (!hasChanges) {
+        setNoChangesNotice(true);
+        setTimeout(() => setNoChangesNotice(false), 3000);
+        return;
+      }
+
       const cleanFormData = { ...formData };
       delete cleanFormData.catalogo_id;
 
       await updateProduct(tenantId, cleanFormData);
       setShowModal(true);
+      setOriginalFormData({ ...formData }); // actualiza referencia
     } catch (err) {
       console.error('Error actualizando producto:', err);
       setError('❌ Error al actualizar el producto');
@@ -77,13 +101,28 @@ export default function EditProductPage() {
     }
   };
 
-  if (!formData) return null;
+  if (isLoading || !formData) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="flex flex-col items-center text-gray-600">
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+          <div className="text-lg">Cargando producto...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-5">
       <div className="mb-4">
         <h1 className="text-2xl font-bold text-gray-800">Editar Producto</h1>
       </div>
+
+      {noChangesNotice && (
+        <div className="bg-yellow-100 text-yellow-800 border border-yellow-300 p-3 rounded mb-4">
+          No realizaste cambios.
+        </div>
+      )}
 
       <ProductForm
         formData={formData}
@@ -98,13 +137,14 @@ export default function EditProductPage() {
         setShowErrors={setShowErrors}
         isLoading={isLoading}
         categories={categories}
+        hasChanges={hasChanges}
       />
 
       <SuccessModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         successMessage="¡Producto modificado exitosamente!"
-        redirectTo={`/products/catalogue/${tenantId}`}
+        redirectTo={`/products`}
         buttonText="Volver al Catálogo"
       />
     </div>

@@ -20,7 +20,8 @@ export default function ProductForm({
   showErrors,
   setShowErrors,
   isLoading,
-  categories
+  categories,
+  hasChanges,
 }) {
   const [validationErrors, setValidationErrors] = useState([]);
 
@@ -177,18 +178,13 @@ export default function ProductForm({
             </div>
           </Step>
 
-          <div className="flex justify-between">
-            <button type="button" onClick={prevStep} className="px-4 py-2 bg-gray-300 rounded">
-              Anterior
-            </button>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
-            >
-              {isLoading ? 'Guardando...' : 'Finalizar'}
-            </button>
-          </div>
+            <StepNavigation
+              prevStep={prevStep}
+              isLast={true}
+              handleFinalSubmit={handleFinalSubmit}
+              isLoading={isLoading}
+              hasChanges={hasChanges}
+            />
         </>
       )}
     </form>
@@ -207,5 +203,6 @@ ProductForm.propTypes = {
   showErrors: PropTypes.bool.isRequired,
   setShowErrors: PropTypes.func.isRequired,
   isLoading: PropTypes.bool.isRequired,
-  categories: PropTypes.array.isRequired, 
+  categories: PropTypes.array.isRequired,
+  hasChanges: PropTypes.bool.isRequired, 
 };
