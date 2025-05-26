@@ -20,8 +20,7 @@ jobs:
           port: 22
           source: "setup-frontend.sh"          # only the one script
           target: "~/"
-          rsync: true                          # faster, skips tar
-          timeout: 1200                       # bump timeout
+          timeout: "1200s"  
 
       - name: Run setup on Frontend
         uses: appleboy/ssh-action@v1
