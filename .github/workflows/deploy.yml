@@ -1,34 +1,34 @@
-name: Deploy to EC2
+# .github/workflows/deploy-frontend.yml
+name: Deploy to Frontend EC2
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
-  deploy:
+  deploy-frontend:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Copy files via SCP
+      - name: Upload setup‐frontend.sh
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "."
-          target: "~/app"
+          port: 22
+          source: "setup-frontend.sh"          # only the one script
+          target: "~/"
+          rsync: true                          # faster, skips tar
+          timeout: 1200                       # bump timeout
 
-      - name: Run remote commands
-        uses: appleboy/ssh-action@v1.0.0
+      - name: Run setup on Frontend
+        uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd ~/app
-            docker-compose down || true
-            docker-compose up -d --build
+            chmod +x ~/setup-frontend.sh
+            sudo ~/setup-frontend.sh
