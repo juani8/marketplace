@@ -11,7 +11,7 @@ cd src
 
 # Instalar dependencias y construir
 npm install
-npm run build
+npm run build -- --outDir=dist
 
 # Reiniciar NGINX para servir la nueva build
 systemctl restart nginx
