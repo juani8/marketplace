@@ -1,22 +1,21 @@
-import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ProductForm from '../components/ProductForm';
 import SuccessModal from '../components/SuccessModal';
 import { createProduct } from '../apis/productsService';
+import { getAllCategories } from '../apis/categoriesService';
 
 export default function CreateProductPage() {
   const navigate = useNavigate();
-  const { tenantId } = useParams();
+  const tenantId = 1;
+
 
   const [formData, setFormData] = useState({
     nombre: '',
     descripcion: '',
     categoria: '',
     precio: '',
-    precio_descuento: '',
     stock: '',
-    oferta: false,
-    destacado: false,
     imagenes: [],
   });
   const [step, setStep] = useState(1);
@@ -24,6 +23,8 @@ export default function CreateProductPage() {
   const [showErrors, setShowErrors] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
+
+  const [categories, setCategories] = useState([]);
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
@@ -57,6 +58,33 @@ export default function CreateProductPage() {
     }
   };
 
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const res = await getAllCategories(); // suponiendo que esto devuelve el array
+        const formatted = res.map((cat) => ({
+          value: String(cat.categoria_id),
+          label: cat.nombre,
+        }));
+        setCategories(formatted);
+      } catch (err) {
+        console.error('Error cargando categorías:', err);
+      }
+    }
+  
+    fetchCategories();
+  }, []);
+
+  const isFormValid = () => {
+    return (
+      formData.nombre.trim() &&
+      formData.descripcion.trim() &&
+      formData.categoria &&
+      formData.precio > 0 &&
+      formData.stock >= 0
+    );
+  };
+
   const nextStep = () => setStep((prev) => prev + 1);
   const prevStep = () => setStep((prev) => prev - 1);
 
@@ -78,12 +106,14 @@ export default function CreateProductPage() {
         showErrors={showErrors}
         setShowErrors={setShowErrors}
         isLoading={isLoading}
+        categories={categories}
+        hasChanges={isFormValid()}
       />
 
       <div className="mt-4">
         <button
           type="button"
-          onClick={() => navigate(`/products/catalogue/${tenantId}`)}
+          onClick={() => navigate(`/products`)}
           className="text-sm text-gray-500 hover:text-gray-700 underline"
         >
           Cancelar y volver al catálogo
@@ -92,9 +122,12 @@ export default function CreateProductPage() {
 
       <SuccessModal
         isOpen={showModal}
-        onClose={() => setShowModal(false)}
+        onClose={() => {
+          setShowModal(false);
+          navigate('/productos');
+      }}
         successMessage="¡Producto creado exitosamente!"
-        redirectTo={`/products/catalogue/${tenantId}`}
+        redirectTo={`/products`}
         buttonText="Volver al Catálogo"
       />
     </div>

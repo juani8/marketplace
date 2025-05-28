@@ -8,9 +8,15 @@ export const getAllTenants = async () => {
 };
 
 // Obtener tenant por ID
-export const getTenantById = async (id) => {
-  const response = await api.get(`/tenants/${id}`);
-  return response.data;
+export const getTenantById = async () => {
+  const res = await api.get('/tenants');
+  const tenants = res.data.data;
+
+  if (!Array.isArray(tenants) || tenants.length === 0) {
+    throw new Error('No hay tenants disponibles.');
+  }
+
+  return tenants[0]; // toma el primero
 };
 
 // Crear un nuevo tenant
@@ -21,7 +27,7 @@ export const createTenant = async (newTenant) => {
 
 // Modificar tenant
 export const updateTenant = async (updatedTenant) => {
-  const response = await api.put(`/tenants/${updatedTenant.tenant_id}`, updatedTenant);
+  const response = await api.patch(`/tenants/${updatedTenant.tenant_id}`, updatedTenant);
   return response.data;
 };
 

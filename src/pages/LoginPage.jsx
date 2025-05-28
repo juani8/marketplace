@@ -8,7 +8,7 @@ export default function LoginPage() {
     console.log('Login con:', email, password);
 
     // validar credenciales y redirigir
-    navigate('/tenants');
+    navigate('/perfil');
   };
 
   return (

@@ -11,6 +11,12 @@ export default function ImageReorderGrid({ images, onReorder, onDelete }) {
     onReorder(reordered);
   };
 
+  const getImageSrc = (img) => {
+    if (typeof img === 'string') return img;
+    if (img instanceof File) return URL.createObjectURL(img);
+    return '';
+  };
+
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
       <Droppable droppableId="imagenes" direction="horizontal">
@@ -21,7 +27,7 @@ export default function ImageReorderGrid({ images, onReorder, onDelete }) {
             ref={provided.innerRef}
           >
             {images.map((img, index) => (
-              <Draggable key={img + index} draggableId={img + index} index={index}>
+              <Draggable key={index} draggableId={`img-${index}`} index={index}>
                 {(provided, snapshot) => (
                   <div
                     ref={provided.innerRef}
@@ -32,7 +38,7 @@ export default function ImageReorderGrid({ images, onReorder, onDelete }) {
                     }`}
                   >
                     <img
-                      src={img}
+                      src={getImageSrc(img)}
                       alt={`Imagen ${index + 1}`}
                       className="w-full h-28 object-cover"
                     />
@@ -56,7 +62,7 @@ export default function ImageReorderGrid({ images, onReorder, onDelete }) {
 }
 
 ImageReorderGrid.propTypes = {
-  images: PropTypes.arrayOf(PropTypes.string).isRequired,
+  images: PropTypes.array.isRequired, // ahora puede ser string o File
   onReorder: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
 };

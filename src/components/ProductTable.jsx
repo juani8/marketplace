@@ -5,64 +5,78 @@ import ImageModal from './ImageModal';
 import StateBadge from './StateBadge';
 import TableActions from './TableActions';
 
-export default function ProductTable({ products, visibleColumns, onEdit, onDelete }) {
+export default function ProductTable({
+  products,
+  visibleColumns,
+  onEdit,
+  onDelete,
+  selectable,
+  selectedIds,
+  onSelectToggle,
+}) {
   const [selectedImage, setSelectedImage] = useState(null);
   const [mobileImageIndexes, setMobileImageIndexes] = useState({});
 
   const handleImageClick = (images, index) => {
     setSelectedImage({ images, index });
   };
-  
+
   const closeModal = () => setSelectedImage(null);
 
   const handlePrevMobileImage = (productId, totalImages) => {
-    setMobileImageIndexes(prev => ({
+    setMobileImageIndexes((prev) => ({
       ...prev,
-      [productId]: (prev[productId] || 0) === 0 ? totalImages - 1 : (prev[productId] || 0) - 1
+      [productId]: (prev[productId] || 0) === 0 ? totalImages - 1 : (prev[productId] || 0) - 1,
     }));
   };
 
   const handleNextMobileImage = (productId, totalImages) => {
-    setMobileImageIndexes(prev => ({
+    setMobileImageIndexes((prev) => ({
       ...prev,
-      [productId]: (prev[productId] || 0) === totalImages - 1 ? 0 : (prev[productId] || 0) + 1
+      [productId]: (prev[productId] || 0) === totalImages - 1 ? 0 : (prev[productId] || 0) + 1,
     }));
   };
 
   return (
     <div className="overflow-x-auto">
-      {/* Modal */}
       {selectedImage && (
-        <ImageModal
-          images={selectedImage.images}
-          initialIndex={selectedImage.index}
-          onClose={closeModal}
-        />
+        <ImageModal images={selectedImage.images} initialIndex={selectedImage.index} onClose={closeModal} />
       )}
+
       {/* Tabla para desktop */}
       <div className="max-h-[70vh] overflow-auto rounded-md shadow hidden md:block">
         <table className="min-w-full bg-white">
           <thead className="bg-gray-100">
             <tr className="text-left">
-              {visibleColumns.includes('imagenes') && (<th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Imagen</th>)}
-              {visibleColumns.includes('id') && (<th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">ID</th>)}
-              {visibleColumns.includes('nombre') && (<th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Nombre</th>)}
-              {visibleColumns.includes('descripcion') && (<th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Descripción</th>)}
-              {visibleColumns.includes('precio') && (<th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Precio</th>)}
-              {visibleColumns.includes('precio_descuento') && (<th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Precio con Descuento</th>)}
-              {visibleColumns.includes('categoria') && (<th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Categoría</th>)}
-              {visibleColumns.includes('estado') && (<th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Estado</th>)}
-              {visibleColumns.includes('stock') && (<th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Stock</th>)}
-              {visibleColumns.includes('oferta') && (<th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">¿En oferta?</th>)}
-              {visibleColumns.includes('destacado') && (<th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">¿Destacado?</th>)}
-              {visibleColumns.includes('fecha_creacion') && (<th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Creación</th>)}
-              {visibleColumns.includes('fecha_actualizacion') && (<th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Actualización</th>)}
-              {visibleColumns.includes('acciones') && (<th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Acciones</th>)}
+              {selectable && <th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Seleccionar</th>}
+              {visibleColumns.includes('id') && <th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">ID</th>}
+              {visibleColumns.includes('imagenes') && <th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Imagen</th>}
+              {visibleColumns.includes('nombre') && <th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Nombre</th>}
+              {visibleColumns.includes('descripcion') && <th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Descripción</th>}
+              {visibleColumns.includes('precio') && <th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Precio</th>}
+              {visibleColumns.includes('precio_descuento') && <th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Precio con Descuento</th>}
+              {visibleColumns.includes('categoria') && <th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Categoría</th>}
+              {visibleColumns.includes('estado') && <th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Estado</th>}
+              {visibleColumns.includes('stock') && <th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Stock</th>}
+              {visibleColumns.includes('oferta') && <th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">¿En oferta?</th>}
+              {visibleColumns.includes('fecha_creacion') && <th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Creación</th>}
+              {visibleColumns.includes('fecha_actualizacion') && <th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Actualización</th>}
+              {visibleColumns.includes('acciones') && <th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Acciones</th>}
             </tr>
           </thead>
           <tbody>
             {products.map((producto) => (
               <tr key={producto.id} className="border-t text-sm">
+                {selectable && (
+                  <td className="py-2 px-4">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.includes(producto.id)}
+                      onChange={() => onSelectToggle(producto.id)}
+                    />
+                  </td>
+                )}
+                {visibleColumns.includes('id') && <td className="py-2 px-4">{producto.id}</td>}
                 {visibleColumns.includes('imagenes') && (
                   <td className="py-2 px-4">
                     {producto.imagenes[0] ? (
@@ -73,36 +87,37 @@ export default function ProductTable({ products, visibleColumns, onEdit, onDelet
                         onClick={() => handleImageClick(producto.imagenes, 0)}
                       />
                     ) : (
-                      <span className="text-gray-400 text-xs">Sin imagenes</span>
+                      <span className="text-gray-400 text-xs">Sin imágenes</span>
                     )}
                   </td>
                 )}
-                {visibleColumns.includes('id') && <td className="py-2 px-4">{producto.id}</td>}
                 {visibleColumns.includes('nombre') && <td className="py-2 px-4">{producto.nombre}</td>}
-                {visibleColumns.includes('descripcion') && (<td className="py-2 px-4">{producto.descripcion}</td>)}
-                {visibleColumns.includes('precio') && (<td className="py-2 px-4">${producto.precio.toFixed(2)}</td>)}
+                {visibleColumns.includes('descripcion') && <td className="py-2 px-4">{producto.descripcion}</td>}
+                {visibleColumns.includes('precio') && <td className="py-2 px-4">${producto.precio.toFixed(2)}</td>}
                 {visibleColumns.includes('precio_descuento') && (
                   <td className="py-2 px-4">
                     {producto.precio_descuento ? `$${producto.precio_descuento.toFixed(2)}` : '—'}
                   </td>
                 )}
-                {visibleColumns.includes('categoria') && (<td className="py-2 px-4">{producto.categoria}</td>)}
+                {visibleColumns.includes('categoria') && (
+                  <td className="py-2 px-4">
+                    {producto.categoria?.nombre || <span className="text-gray-400 italic">Sin categoría</span>}
+                  </td>
+                )}
                 {visibleColumns.includes('estado') && (
                   <td className="py-2 px-4">
                     <StateBadge estado={producto.stock > 0 ? 'disponible' : 'no_disponible'} tipo="producto" />
                   </td>
                 )}
-                {visibleColumns.includes('stock') && (<td className="py-2 px-4">{producto.stock}</td>)}
-                {visibleColumns.includes('oferta') && (<td className="py-2 px-4">{producto.oferta ? 'Sí' : 'No'}</td>)}
-                {visibleColumns.includes('destacado') && (<td className="py-2 px-4">{producto.destacado ? 'Sí' : 'No'}</td>)}
-                {visibleColumns.includes('fecha_creacion') && (<td className="py-2 px-4">{producto.fecha_creacion}</td>)}
-                {visibleColumns.includes('fecha_actualizacion') && (<td className="py-2 px-4">{producto.fecha_actualizacion}</td>)}
+                {visibleColumns.includes('stock') && <td className="py-2 px-4">{producto.stock}</td>}
+                {visibleColumns.includes('oferta') && (
+                  <td className="py-2 px-4">{producto.oferta ? 'Sí' : 'No'}</td>
+                )}
+                {visibleColumns.includes('fecha_creacion') && <td className="py-2 px-4">{producto.fecha_creacion}</td>}
+                {visibleColumns.includes('fecha_actualizacion') && <td className="py-2 px-4">{producto.fecha_actualizacion}</td>}
                 {visibleColumns.includes('acciones') && (
                   <td className="py-2 px-4">
-                    <TableActions
-                      onEdit={() => onEdit(producto)}
-                      onDelete={() => onDelete(producto)}
-                    />
+                    <TableActions onEdit={() => onEdit(producto)} onDelete={() => onDelete(producto)} />
                   </td>
                 )}
               </tr>
@@ -155,6 +170,24 @@ export default function ProductTable({ products, visibleColumns, onEdit, onDelet
                 </div>
               )}
 
+              {selectable && (
+                <div className="mb-2">
+                  <label className="inline-flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.includes(producto.id)}
+                      onChange={() => onSelectToggle(producto.id)}
+                    />
+                    <span className="font-semibold">Seleccionar</span>
+                  </label>
+                </div>
+              )}
+
+              {visibleColumns.includes('id') && (
+                <div className="mb-2">
+                  <span className="font-semibold">ID:</span> {producto.id}
+                </div>
+              )}
               {visibleColumns.includes('nombre') && (
                 <div className="mb-2">
                   <span className="font-semibold">Nombre:</span> {producto.nombre}
@@ -170,14 +203,10 @@ export default function ProductTable({ products, visibleColumns, onEdit, onDelet
                   <span className="font-semibold">Precio:</span> ${producto.precio.toFixed(2)}
                 </div>
               )}
-              {visibleColumns.includes('precio_descuento') && producto.precio_descuento && (
-                <div className="mb-2">
-                  <span className="font-semibold">Precio con Descuento:</span> ${producto.precio_descuento.toFixed(2)}
-                </div>
-              )}
               {visibleColumns.includes('categoria') && (
                 <div className="mb-2">
-                  <span className="font-semibold">Categoría:</span> {producto.categoria}
+                  <span className="font-semibold">Categoría:</span>{' '}
+                  {producto.categoria?.nombre || <span className="italic text-gray-500">Sin categoría</span>}
                 </div>
               )}
               {visibleColumns.includes('estado') && (
@@ -186,39 +215,11 @@ export default function ProductTable({ products, visibleColumns, onEdit, onDelet
                   <StateBadge estado={producto.stock > 0 ? 'disponible' : 'no_disponible'} tipo="producto" />
                 </div>
               )}
-              {visibleColumns.includes('stock') && (
-                <div className="mb-2">
-                  <span className="font-semibold">Stock:</span> {producto.stock}
-                </div>
-              )}
-              {visibleColumns.includes('oferta') && (
-                <div className="mb-2">
-                  <span className="font-semibold">Oferta:</span> {producto.oferta ? 'Sí' : 'No'}
-                </div>
-              )}
-              {visibleColumns.includes('destacado') && (
-                <div className="mb-2">
-                  <span className="font-semibold">Destacado:</span> {producto.destacado ? 'Sí' : 'No'}
-                </div>
-              )}
-              {visibleColumns.includes('fecha_creacion') && (
-                <div className="mb-2">
-                  <span className="font-semibold">Creación:</span> {producto.fecha_creacion}
-                </div>
-              )}
-              {visibleColumns.includes('fecha_actualizacion') && (
-                <div className="mb-2">
-                  <span className="font-semibold">Actualización:</span> {producto.fecha_actualizacion}
-                </div>
-              )}
               {visibleColumns.includes('acciones') && (
-                <div className="flex justify-end gap-2 mt-2">
-                  <TableActions
-                    onEdit={() => onEdit(producto)}
-                    onDelete={() => onDelete(producto)}
-                  />
+                <div className="mt-3 flex justify-end">
+                  <TableActions onEdit={() => onEdit(producto)} onDelete={() => onDelete(producto)} />
                 </div>
-              )}
+              )}  
             </div>
           );
         })}
@@ -230,6 +231,17 @@ export default function ProductTable({ products, visibleColumns, onEdit, onDelet
 ProductTable.propTypes = {
   products: PropTypes.array.isRequired,
   visibleColumns: PropTypes.arrayOf(PropTypes.string).isRequired,
-  onEdit: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
+  onEdit: PropTypes.func,
+  onDelete: PropTypes.func,
+  selectable: PropTypes.bool,
+  selectedIds: PropTypes.arrayOf(PropTypes.number),
+  onSelectToggle: PropTypes.func,
+};
+
+ProductTable.defaultProps = {
+  onEdit: () => {},
+  onDelete: () => {},
+  selectable: false,
+  selectedIds: [],
+  onSelectToggle: () => {},
 };

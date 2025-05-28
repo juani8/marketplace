@@ -69,8 +69,8 @@ export default function TenantsTable({ tenants, onEdit, onDelete }) {
             <div className="mb-2">
               <span className="font-semibold">Dirección:</span>{' '}
               {tenant.calle
-              ? `${tenant.calle} ${tenant.numero}, ${tenant.ciudad}, ${tenant.provincia}`
-              : '-'}
+            ? `${tenant.calle} ${tenant.numero}, ${tenant.ciudad}, ${tenant.provincia}`
+            : '-'}
             </div>
             <div className="mb-2">
               <span className="font-semibold">Email:</span>{' '}

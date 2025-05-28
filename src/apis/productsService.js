@@ -1,90 +1,74 @@
-import mockTenants from '../mocks/mockTenants';
+import api from './api_config';
 
 // Crear producto
-export const createProduct = async (tenantId, newProduct) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const tenant = mockTenants.find((t) => t.tenant_id === parseInt(tenantId));
-      if (!tenant) {
-        reject(new Error('Tenant no encontrado'));
-        return;
-      }
+export const createProduct = async (tenantId, formData) => {
+  const data = new FormData();
 
-      const productos = tenant.productos || [];
-      const newId = productos.length > 0 ? Math.max(...productos.map(p => p.id)) + 1 : 1;
+  data.append('nombre_producto', formData.nombre);
+  data.append('descripcion', formData.descripcion);
+  data.append('precio', formData.precio);
+  data.append('cantidad_stock', formData.stock);
+  data.append('categoria_id', formData.categoria); // debe ser el ID de categoría
+  data.append('tenant_id', tenantId);
 
-      const productoConId = {
-        ...newProduct,
-        id: newId,
-        fecha_creacion: new Date().toISOString().split('T')[0],
-        fecha_actualizacion: new Date().toISOString().split('T')[0],
-      };
-
-      tenant.productos.push(productoConId);
-      resolve(productoConId);
-    }, 500);
+  formData.imagenes.forEach((imgFile) => {
+    data.append('imagenes', imgFile); // deben ser File, no base64
   });
+
+  const response = await api.post('/products', data);
+
+  return response.data;
 };
 
 // Obtener todos los productos de un tenant
-export const getProductsByTenant = async (tenantId) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const tenant = mockTenants.find((t) => t.tenant_id === parseInt(tenantId));
-      if (tenant) {
-        resolve(tenant.productos || []);
-      } else {
-        reject(new Error('Tenant no encontrado'));
-      }
-    }, 500);
-  });
+export const getAllProducts = async () => {
+  const res = await api.get('/products');
+  return res.data; // el array de productos viene directamente
 };
 
-// Obtener un producto por ID dentro de un tenant
-export const getProductById = async (tenantId, productId) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const tenant = mockTenants.find((t) => t.tenant_id === parseInt(tenantId));
-      if (!tenant) return reject(new Error('Tenant no encontrado'));
+// Obtener producto por Id
+export const getProductById = async (productId) => {
+  const response = await api.get(`/products/${productId}`);
+  const p = response.data;
 
-      const producto = tenant.productos.find((p) => p.id === parseInt(productId));
-      resolve(producto || null);
-    }, 500);
-  });
+  return {
+    id: parseInt(p.producto_id),
+    nombre: p.nombre_producto,
+    precio: p.precio,
+    descripcion: p.descripcion,
+    stock: p.cantidad_stock,
+    categoria: p.categoria?.categoria_id || '',
+    imagenes: p.imagenes || [],
+  };
 };
+
 
 // Actualizar producto
-export const updateProduct = async (tenantId, updatedProduct) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const tenant = mockTenants.find((t) => t.tenant_id === parseInt(tenantId));
-      if (!tenant) return reject(new Error('Tenant no encontrado'));
+export const updateProduct = async (tenantId, formData) => {
+  const data = new FormData();
 
-      const index = tenant.productos.findIndex((p) => p.id === updatedProduct.id);
-      if (index === -1) return reject(new Error('Producto no encontrado'));
+  data.append('nombre_producto', formData.nombre);
+  data.append('descripcion', formData.descripcion);
+  data.append('precio', formData.precio);
+  data.append('cantidad_stock', formData.stock);
+  data.append('categoria_id', formData.categoria);
+  data.append('tenant_id', tenantId);
 
-      tenant.productos[index] = {
-        ...updatedProduct,
-        fecha_actualizacion: new Date().toISOString().split('T')[0],
-      };
+  // ✅ Solo se mandan imágenes nuevas (archivos)
+  const nuevasImagenes = formData.imagenes.filter((img) => img instanceof File);
+  if (nuevasImagenes.length > 0) {
+    nuevasImagenes.forEach((file) => {
+      data.append('imagenes', file);
+    });
+  }
 
-      resolve(tenant.productos[index]);
-    }, 500);
-  });
+  const response = await api.patch(`/products/${formData.id}`, data);
+  return response.data;
 };
 
+
 // Eliminar producto
-export const deleteProduct = async (tenantId, productId) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const tenant = mockTenants.find((t) => t.tenant_id === parseInt(tenantId));
-      if (!tenant) return reject(new Error('Tenant no encontrado'));
-
-      const index = tenant.productos.findIndex((p) => p.id === parseInt(productId));
-      if (index === -1) return reject(new Error('Producto no encontrado'));
-
-      tenant.productos.splice(index, 1);
-      resolve();
-    }, 500);
-  });
+export const deleteProduct = async (productId) => {
+  const response = await api.delete(`/products/${productId}`);
+  return response.data;
 };
