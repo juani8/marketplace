@@ -35,3 +35,4 @@ jobs:
           script: |
             chmod +x ~/setup-frontend.sh
             sudo ~/setup-frontend.sh
+
