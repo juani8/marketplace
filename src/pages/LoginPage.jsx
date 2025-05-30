@@ -12,7 +12,7 @@ export default function LoginPage() {
     const fetchBackendStatus = async () => {
       try {
         const status = await checkBackendStatus();
-        setBackendStatus(status?.status || 'OK');
+        setBackendStatus(status);
       } catch (err) {
         setError('No se pudo conectar al backend');
       }
@@ -29,16 +29,16 @@ export default function LoginPage() {
 
   return (
     <>
-      <div style={{ marginBottom: 16 }}>
-        {error && <span style={{ color: 'red' }}>{error}</span>}
-        {backendStatus && <span style={{ color: 'green' }}>Backend: {backendStatus}</span>}
-      </div>
       <AuthForm
         title="Iniciar sesión"
         submitButtonText="Iniciar sesión"
         onSubmit={handleLogin}
         showForgotPassword={true}
       />
+      <div style={{ marginTop: 16, textAlign: 'center' }}>
+        {error && <span style={{ color: 'red', display: 'block' }}>{error}</span>}
+        {backendStatus && <span style={{ color: 'green', display: 'block' }}>Backend status: {backendStatus}</span>}
+      </div>
     </>
   );
 }
