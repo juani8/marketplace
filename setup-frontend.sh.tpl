@@ -1,3 +1,9 @@
+#!/bin/bash
+set -e
+
+apt update -y
+apt install -y git nginx curl
+
 # Instalar Node.js si no existe
 if ! command -v node > /dev/null; then
   curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
@@ -34,6 +40,10 @@ server {
 
     location / {
         try_files $uri $uri/ /index.html;
+    }
+
+    location = /index.html {
+        add_header Cache-Control "no-cache";
     }
 }
 NGINX
