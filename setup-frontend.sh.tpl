@@ -31,7 +31,7 @@ chown -R www-data:www-data /var/www/frontend/dist
 chmod -R 755 /var/www/frontend/dist
 
 # Configurar NGINX para servir el frontend
-sudo tee /etc/nginx/sites-available/default > /dev/null <<'NGINX'
+sudo tee /etc/nginx/sites-available/default > /dev/null <<'EOF'
 server {
     listen 80;
     root /var/www/frontend/dist;
@@ -46,7 +46,6 @@ server {
         add_header Cache-Control "no-cache";
     }
 }
-NGINX
+EOF
 
-# Validar y reiniciar nginx
 sudo nginx -t && sudo systemctl restart nginx
