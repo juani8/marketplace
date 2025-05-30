@@ -39,7 +39,7 @@ server {
     server_name _;
 
     location / {
-        try_files $uri $uri/ /index.html;
+        try_files ${try_files_directiva};
     }
 
     location = /index.html {
