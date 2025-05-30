@@ -28,7 +28,7 @@ export default function LoginPage() {
   };
 
   return (
-    <>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <AuthForm
         title="Iniciar sesión"
         submitButtonText="Iniciar sesión"
@@ -39,6 +39,6 @@ export default function LoginPage() {
         {error && <span style={{ color: 'red', display: 'block' }}>{error}</span>}
         {backendStatus && <span style={{ color: 'green', display: 'block' }}>Backend status: {backendStatus}</span>}
       </div>
-    </>
+    </div>
   );
 }
