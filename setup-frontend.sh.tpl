@@ -1,13 +1,20 @@
 #!/bin/bash
+set -e
+
 apt update -y
 apt install -y git nginx curl
 
-# Instalar Node.js
-curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
-apt install -y nodejs
+# Instalar Node.js si no existe
+if ! command -v node > /dev/null; then
+  curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+  apt install -y nodejs
+fi
 
-# Clonar y construir el proyecto
+# Clonar o actualizar el proyecto
 cd /var/www
+if [ -d frontend ]; then
+  rm -rf frontend
+fi
 git clone ${frontend_repo_url} frontend
 cd frontend/src
 
@@ -16,7 +23,12 @@ cat <<EOF > .env
 VITE_BACKEND_URL=${vite_backend_url}
 EOF
 
-npm install && npm run build
+npm install
+npm run build
+
+# Ajustar permisos
+chown -R www-data:www-data /var/www/frontend/dist
+chmod -R 755 /var/www/frontend/dist
 
 # Configurar NGINX para servir el frontend
 cat <<NGINX > /etc/nginx/sites-available/default
