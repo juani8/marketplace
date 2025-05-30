@@ -1,4 +1,3 @@
-# .github/workflows/deploy-frontend.yml
 name: Deploy to Frontend EC2
 
 on:
@@ -11,14 +10,19 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Upload setup‐frontend.sh
+      - name: Render setup-frontend.sh from template
+        run: |
+          export VITE_API_URL="${{ secrets.VITE_API_URL }}"
+          envsubst < setup-frontend.sh.tpl > setup-frontend.sh
+
+      - name: Upload setup-frontend.sh
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
-          source: "setup-frontend.sh"          # only the one script
+          source: "setup-frontend.sh"
           target: "~/"
           timeout: "1200s"  
 
@@ -31,4 +35,3 @@ jobs:
           script: |
             chmod +x ~/setup-frontend.sh
             sudo ~/setup-frontend.sh
-
