@@ -14,7 +14,8 @@ jobs:
         run: |
           export frontend_repo_url="https://github.com/juani8/marketplace.git"
           export vite_backend_url="${{ secrets.VITE_BACKEND_URL }}"
-          envsubst < setup-frontend.sh.tpl > setup-frontend.sh
+          envsubst '${frontend_repo_url} ${vite_backend_url}' < setup-frontend.sh.tpl > setup-frontend.sh
+
 
       - name: (Debug) Show rendered setup-frontend.sh
         run: cat setup-frontend.sh
