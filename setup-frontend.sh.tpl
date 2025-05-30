@@ -31,7 +31,7 @@ chown -R www-data:www-data /var/www/frontend/dist
 chmod -R 755 /var/www/frontend/dist
 
 # Configurar NGINX para servir el frontend
-sudo tee /etc/nginx/sites-available/default > /dev/null <<'EOF'
+sudo tee /etc/nginx/sites-available/default > /dev/null <<EOF
 server {
     listen 80;
     root /var/www/frontend/dist;
@@ -39,7 +39,7 @@ server {
     server_name _;
 
     location / {
-        try_files \$uri \$uri/ /index.html;
+        try_files \$\$uri \$\$uri/ /index.html;
     }
 
     location = /index.html {
