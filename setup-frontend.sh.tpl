@@ -1,9 +1,3 @@
-#!/bin/bash
-set -e
-
-apt update -y
-apt install -y git nginx curl
-
 # Instalar Node.js si no existe
 if ! command -v node > /dev/null; then
   curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
@@ -31,7 +25,7 @@ chown -R www-data:www-data /var/www/frontend/dist
 chmod -R 755 /var/www/frontend/dist
 
 # Configurar NGINX para servir el frontend
-cat <<NGINX > /etc/nginx/sites-available/default
+sudo tee /etc/nginx/sites-available/default > /dev/null <<'NGINX'
 server {
     listen 80;
     root /var/www/frontend/dist;
@@ -39,9 +33,10 @@ server {
     server_name _;
 
     location / {
-        try_files \$uri \$uri/ /index.html;
+        try_files $uri $uri/ /index.html;
     }
 }
 NGINX
 
-systemctl restart nginx
+# Validar y reiniciar nginx
+sudo nginx -t && sudo systemctl restart ngin
