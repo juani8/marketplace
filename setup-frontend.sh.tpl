@@ -39,4 +39,4 @@ server {
 NGINX
 
 # Validar y reiniciar nginx
-sudo nginx -t && sudo systemctl restart ngin
+sudo nginx -t && sudo systemctl restart nginx
