@@ -16,7 +16,7 @@ if [ -d frontend ]; then
   rm -rf frontend
 fi
 git clone ${frontend_repo_url} frontend
-cd frontend/src
+cd frontend
 
 # Crear archivo .env para Vite
 cat <<EOF > .env
