@@ -2,7 +2,7 @@
 set -e
 
 apt update -y
-apt install -y git nginx curl
+apt install -y git nginx curl certbot python3-certbot-nginx
 
 # Instalar Node.js si no existe
 if ! command -v node > /dev/null; then
@@ -31,15 +31,26 @@ chown -R www-data:www-data /var/www/frontend/dist
 chmod -R 755 /var/www/frontend/dist
 
 # Configurar NGINX para servir el frontend
-sudo tee /etc/nginx/sites-available/default > /dev/null <<EOF
+sudo tee /etc/nginx/sites-available/marketplace > /dev/null <<EOF
 server {
     listen 80;
+    server_name marketplace.deliver.ar;
+
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name marketplace.deliver.ar;
+
+    ssl_certificate /etc/letsencrypt/live/marketplace.deliver.ar/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/marketplace.deliver.ar/privkey.pem;
+
     root /var/www/frontend/dist;
     index index.html;
-    server_name _;
 
     location / {
-        try_files ${try_files_directiva};
+        try_files $uri /index.html;
     }
 
     location = /index.html {
@@ -47,5 +58,9 @@ server {
     }
 }
 EOF
+
+sudo rm /etc/nginx/sites-enabled/default
+sudo certbot install --cert-name marketplace.deliver.ar --non-interactive --agree-tos --email pruebadepruebas@gmail.com
+sudo ln -s /etc/nginx/sites-available/marketplace /etc/nginx/sites-enabled/marketplace
 
 sudo nginx -t && sudo systemctl restart nginx
