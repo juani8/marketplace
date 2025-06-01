@@ -59,7 +59,9 @@ server {
 }
 EOF
 
-sudo rm /etc/nginx/sites-enabled/default
+if [ -e /etc/nginx/sites-enabled/default ]; then
+    sudo rm /etc/nginx/sites-enabled/default
+fi
 sudo certbot install --cert-name marketplace.deliver.ar --non-interactive --agree-tos --email pruebadepruebas@gmail.com
 sudo ln -s /etc/nginx/sites-available/marketplace /etc/nginx/sites-enabled/marketplace
 
