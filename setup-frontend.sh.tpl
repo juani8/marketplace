@@ -69,6 +69,8 @@ else
   sudo certbot install --cert-name marketplace.deliver.ar --non-interactive --agree-tos --email pruebadepruebas@gmail.com
 fi
 
-sudo ln -s /etc/nginx/sites-available/marketplace /etc/nginx/sites-enabled/marketplace
+if [ ! -e /etc/nginx/sites-enabled/marketplace ]; then
+  sudo ln -s /etc/nginx/sites-available/marketplace /etc/nginx/sites-enabled/marketplace
+fi
 
 sudo nginx -t && sudo systemctl restart nginx
