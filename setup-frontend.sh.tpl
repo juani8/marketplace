@@ -50,7 +50,7 @@ server {
     index index.html;
 
     location / {
-        try_files $uri /index.html;
+        try_files ${try_files_directiva};
     }
 
     location = /index.html {
@@ -62,7 +62,13 @@ EOF
 if [ -e /etc/nginx/sites-enabled/default ]; then
     sudo rm /etc/nginx/sites-enabled/default
 fi
-sudo certbot install --cert-name marketplace.deliver.ar --non-interactive --agree-tos --email pruebadepruebas@gmail.com
+
+if [ -e /etc/letsencrypt/live/marketplace.deliver.ar/fullchain.pem ]; then
+  echo "Certificate already exists, skipping certbot obtain"
+else
+  sudo certbot install --cert-name marketplace.deliver.ar --non-interactive --agree-tos --email pruebadepruebas@gmail.com
+fi
+
 sudo ln -s /etc/nginx/sites-available/marketplace /etc/nginx/sites-enabled/marketplace
 
 sudo nginx -t && sudo systemctl restart nginx
