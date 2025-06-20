@@ -75,7 +75,7 @@ fi
 if [ -e /etc/letsencrypt/live/marketplace.deliver.ar/fullchain.pem ]; then
   echo "Certificate already exists, skipping certbot obtain"
 else
-  sudo certbot install --cert-name marketplace.deliver.ar --non-interactive --agree-tos --email pruebadepruebas@gmail.com
+  sudo certbot --nginx --non-interactive --agree-tos --redirect --email pruebadepruebas@gmail.com -d marketplace.deliver.ar
 fi
 
 if [ ! -e /etc/nginx/sites-enabled/marketplace ]; then
