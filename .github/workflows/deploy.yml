@@ -14,7 +14,7 @@ jobs:
         run: |
           export frontend_repo_url="https://github.com/juani8/marketplace.git"
           export vite_backend_url="${{ secrets.VITE_BACKEND_URL }}"
-          export try_files_directiva='$uri $uri/ /index.html'
+          export try_files_directiva='\$uri \$uri/ /index.html'
           envsubst '${frontend_repo_url} ${vite_backend_url} ${try_files_directiva}' \
             < setup-frontend.sh.tpl > setup-frontend.sh
 
