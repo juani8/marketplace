@@ -36,7 +36,14 @@ server {
     listen 80;
     server_name marketplace.deliver.ar;
 
-    return 301 https://$host$request_uri;
+    location /.well-known/acme-challenge/ {
+        root /var/www/html;
+        allow all;
+    }
+
+    location / {
+        return 301 https://\$host\$request_uri;
+    }
 }
 
 server {
@@ -50,7 +57,7 @@ server {
     index index.html;
 
     location / {
-        try_files ${try_files_directiva};
+        try_files \$uri \$uri/ /index.html;
     }
 
     location = /index.html {
@@ -60,26 +67,33 @@ server {
     location /api/ {
         proxy_pass http://10.0.2.112:3000/api/;
         proxy_http_version 1.1;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
     }
 }
 EOF
 
+# Remove default site if present
 if [ -e /etc/nginx/sites-enabled/default ]; then
     sudo rm /etc/nginx/sites-enabled/default
 fi
 
+# Enable site BEFORE certbot so certbot sees the server block
+if [ ! -e /etc/nginx/sites-enabled/marketplace ]; then
+  sudo ln -s /etc/nginx/sites-available/marketplace /etc/nginx/sites-enabled/marketplace
+fi
+
+# Test and reload nginx so certbot sees correct config
+sudo nginx -t && sudo systemctl reload nginx
+
+# Run certbot (will inject SSL into server block if not present)
 if [ -e /etc/letsencrypt/live/marketplace.deliver.ar/fullchain.pem ]; then
   echo "Certificate already exists, skipping certbot obtain"
 else
   sudo certbot --nginx --non-interactive --agree-tos --redirect --email pruebadepruebas@gmail.com -d marketplace.deliver.ar
 fi
 
-if [ ! -e /etc/nginx/sites-enabled/marketplace ]; then
-  sudo ln -s /etc/nginx/sites-available/marketplace /etc/nginx/sites-enabled/marketplace
-fi
-
-sudo nginx -t && sudo systemctl restart nginx
+# Final nginx reload in case certbot changed anything
+sudo nginx -t && sudo systemctl reload nginx
