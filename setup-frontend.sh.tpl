@@ -33,6 +33,7 @@ chmod -R 755 /var/www/frontend/dist
 
 # Configuración Nginx SOLO HTTP (sin SSL, para bootstrap de certbot)
 sudo tee /etc/nginx/sites-available/marketplace > /dev/null <<EOF
+
 server {
     listen 80;
     server_name marketplace.deliver.ar;
@@ -52,7 +53,11 @@ server {
     index index.html;
 
     location / {
-        try_files $uri $uri/ /index.html;
+        try_files ${try_files_directiva};
+    }
+
+    location = /index.html {
+        add_header Cache-Control "no-cache";
     }
 
     location /api/ {
