@@ -37,7 +37,11 @@ export default function LoginPage() {
       />
       <div style={{ marginTop: 16, textAlign: 'center' }}>
         {error && <span style={{ color: 'red', display: 'block' }}>{error}</span>}
-        {backendStatus && <span style={{ color: 'green', display: 'block' }}>Backend status: {backendStatus}</span>}
+        {backendStatus && (
+          <span style={{ color: 'green', display: 'block' }}>
+            Backend status: {backendStatus.status} ({backendStatus.timestamp})
+          </span>
+        )}
       </div>
     </div>
   );
