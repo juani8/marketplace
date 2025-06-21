@@ -37,7 +37,7 @@ sudo tee /etc/nginx/sites-available/marketplace > /dev/null <<EOF
 server {
     listen 80;
     server_name marketplace.deliver.ar;
-    return 301 https://$host$request_uri;
+    return 301 https://\$host\$request_uri;
 }
 
 server {
@@ -63,10 +63,10 @@ server {
     location /api/ {
         proxy_pass http://localhost:3000/api/;
         proxy_http_version 1.1;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
     }
 
     location /.well-known/acme-challenge/ {
