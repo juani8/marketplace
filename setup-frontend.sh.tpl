@@ -36,21 +36,32 @@ sudo tee /etc/nginx/sites-available/marketplace > /dev/null <<EOF
 server {
     listen 80;
     server_name marketplace.deliver.ar;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name marketplace.deliver.ar;
+
+    ssl_certificate /etc/letsencrypt/live/marketplace.deliver.ar/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/marketplace.deliver.ar/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
     root /var/www/frontend/dist;
     index index.html;
 
     location / {
-        try_files \$uri \$uri/ /index.html;
+        try_files $uri $uri/ /index.html;
     }
 
     location /api/ {
         proxy_pass http://localhost:3000/api/;
         proxy_http_version 1.1;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
 
     location /.well-known/acme-challenge/ {
