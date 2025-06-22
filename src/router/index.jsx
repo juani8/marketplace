@@ -7,6 +7,7 @@ import CreateProductPage from '../pages/CreateProductPage';
 import PromotionsPage from '../pages/PromotionsPage';
 import CreatePromotionPage from '../pages/CreatePromotionPage';
 import EditPromotionPage from '../pages/EditPromotionPage';
+import DashboardPage from '../pages/DashboardPage';
 import PrivateLayout from '../layouts/PrivateLayout';
 import PublicLayout from '../layouts/PublicLayout'; 
 
@@ -23,6 +24,7 @@ export default function AppRouter() {
         {/* Layout privado para usuarios logueados */}
         <Route element={<PrivateLayout />}>
           <Route path="/perfil" element={<TenantProfilePage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/products/" element={<ProductsCataloguePage />} />
           <Route path="/products/create/:tenantId" element={<CreateProductPage />} />
           <Route path="/products/edit/:tenantId/:productId" element={<EditProductPage />} />
