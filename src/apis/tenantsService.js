@@ -1,4 +1,4 @@
-import api from './api_config'; // nuevo
+import api from './api_config'; 
 
 // Obtener todos los tenants
 export const getAllTenants = async () => {
@@ -35,3 +35,4 @@ export const updateTenant = async (updatedTenant) => {
 export const deleteTenant = async (id) => {
   await api.delete(`/tenants/${id}`);
 };
+

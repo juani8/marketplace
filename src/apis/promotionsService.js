@@ -1,6 +1,6 @@
 import api from './api_config';
 
-// Obtener promociones
+//Obtener promociones
 export const getAllPromotions = async () => {
     const res = await api.get('/promotions');
     return res.data;

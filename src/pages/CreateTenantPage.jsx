@@ -133,6 +133,7 @@ export default function CreateTenantPage() {
         showErrors={showErrors}
         setShowErrors={setShowErrors}
         isLoading={isLoading}
+        isEditing={true}
       />
 
       <div className="mt-4">

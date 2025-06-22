@@ -9,6 +9,10 @@ import CreatePromotionPage from '../pages/CreatePromotionPage';
 import EditPromotionPage from '../pages/EditPromotionPage';
 import PrivateLayout from '../layouts/PrivateLayout';
 import PublicLayout from '../layouts/PublicLayout'; 
+import RegisterPage from '../pages/RegisterPage'; 
+import CreateTenantPage from '../pages/CreateTenantPage'; 
+
+
 
 export default function AppRouter() {
   return (
@@ -18,6 +22,7 @@ export default function AppRouter() {
         <Route element={<PublicLayout />}>
           <Route path="/" element={<LoginPage />} /> 
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
         </Route>
 
         {/* Layout privado para usuarios logueados */}
@@ -29,6 +34,7 @@ export default function AppRouter() {
           <Route path="/promociones" element={<PromotionsPage />} />
           <Route path="/promociones/create" element={<CreatePromotionPage />} />
           <Route path="/promociones/edit/:id" element={<EditPromotionPage />} />
+          <Route path="/crear-tenant" element={<CreateTenantPage />} />
         </Route>
 
       </Routes>
