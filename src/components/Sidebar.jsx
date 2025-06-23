@@ -5,14 +5,17 @@ import {
   FaTags,
   FaCog,
   FaSignOutAlt,
-  FaTachometerAlt,
+  FaUserPlus,
 } from 'react-icons/fa';
 import PropTypes from 'prop-types';
 
 export default function Sidebar({ isCollapsed, toggleSidebar }) {
   const location = useLocation();
-
   const isActive = (path) => location.pathname.startsWith(path);
+
+  // ✅ Obtener usuario desde localStorage
+  const user = JSON.parse(localStorage.getItem('user'));
+  const isAdmin = user?.rol === 'admin';
 
   return (
     <aside
@@ -33,7 +36,6 @@ export default function Sidebar({ isCollapsed, toggleSidebar }) {
 
       {/* Navegación */}
       <nav className="flex-1 flex flex-col gap-2 px-2">
-
         <Link
           to="/perfil"
           className={`flex items-center gap-3 px-2 py-2 rounded hover:bg-blue-600 ${
@@ -64,6 +66,19 @@ export default function Sidebar({ isCollapsed, toggleSidebar }) {
           {!isCollapsed && <span>Promociones</span>}
         </Link>
 
+        {/* ✅ Solo visible para ADMIN */}
+        {isAdmin && (
+          <Link
+            to="/usuarios"
+            className={`flex items-center gap-3 px-2 py-2 rounded hover:bg-blue-600 ${
+              isActive('/editar-user') ? 'bg-blue-700' : ''
+            }`}
+          >
+            <FaUserPlus className="text-xl" />
+            {!isCollapsed && <span>Usuarios</span>}
+          </Link>
+        )}
+
         <Link
           to="/configuracion"
           className={`flex items-center gap-3 px-2 py-2 rounded hover:bg-blue-600 ${
@@ -73,6 +88,8 @@ export default function Sidebar({ isCollapsed, toggleSidebar }) {
           <FaCog className="text-xl" />
           {!isCollapsed && <span>Configuración</span>}
         </Link>
+
+        
       </nav>
 
       {/* Cerrar sesión */}

@@ -1,12 +1,7 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-// import { register, login } from '../apis/authService'; // real
-// import { getSellers } from '../apis/sellerService'; // real
-import { getAllTenants } from '@/apis/tenantsService'; // mock
+import { useState, useEffect } from 'react';
+import { createUser, getAllCommerces } from '@/apis/usersService'; 
 
-export default function RegisterPage() {
-  const navigate = useNavigate();
-
+export default function RegisterUserModal({ onClose, onSuccess, usuario_id, tenant_id }) {
   const [form, setForm] = useState({
     email: '',
     password: '',
@@ -18,17 +13,22 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    const fetchComercios = async () => {
+      try {
+        const response = await getAllCommerces(usuario_id);
+        setComercios(response);
+      } catch (err) {
+        console.error('Error al obtener comercios', err);
+        setComercios([]);
+      }
+    };
+
     if (form.rol === 'operador') {
-      getAllTenants()
-        .then((data) => {
-          const activos = data.filter((t) => t.estado === 'activo');
-          setComercios(activos);
-        })
-        .catch(() => setError('Error al cargar los comercios'));
+      fetchComercios();
     } else {
-      setComercios([]); // sacar si se cambia a admin
+      setComercios([]);
     }
-  }, [form.rol]);
+  }, [form.rol, usuario_id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -45,48 +45,42 @@ export default function RegisterPage() {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError('');
 
-    if (!form.email || !form.password) {
-      setError('Email y contraseña son obligatorios');
-      return;
-    }
+  if (!form.email || !form.password) {
+    setError('Email y contraseña son obligatorios');
+    return;
+  }
 
-    if (form.rol === 'operador' && form.comercioIds.length === 0) {
-      setError('Seleccioná al menos un comercio');
-      return;
-    }
+  if (form.rol === 'operador' && form.comercioIds.length === 0) {
+    setError('Seleccioná al menos un comercio');
+    return;
+  }
 
-    try {
-      console.log('⚠️ Registro mockeado:', form);
+  const userData = {
+  email: form.email,
+  password: form.password,
+  rol: form.rol,
+  tenant_id, 
+  comercios: form.rol === 'operador' ? form.comercioIds : [],
+};
 
-      const res = {
-        token: 'mock-token-123',
-        user: {
-          id: 'mock-user-id',
-          email: form.email,
-          rol: form.rol,
-          tenantId: 'mock-tenant-id',
-        },
-      };
-
-      console.log('Login OK (mock):', res);
-      localStorage.setItem('token', res.token);
-      localStorage.setItem('user', JSON.stringify(res.user));
-
-      navigate(form.rol === 'admin' ? '/crear-tenant' : '/perfil');
-
-    } catch (err) {
-      console.error(err);
-      setError('Error al registrar. Intentá más tarde.');
-    }
-  };
+  try {
+    const nuevoUsuario = await createUser(userData);
+    onSuccess(nuevoUsuario);
+    onClose();
+  } catch (err) {
+    console.error(err);
+    setError('Hubo un problema al crear el usuario');
+  }
+};
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100 px-4">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold text-blue-600 mb-6 text-center">Registrarse</h2>
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+      <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
+        <h2 className="text-xl font-bold text-blue-600 mb-4 text-center">Crear Usuario</h2>
 
         {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
 
@@ -130,11 +124,11 @@ export default function RegisterPage() {
                   <p className="text-sm text-gray-500">No hay comercios disponibles</p>
                 ) : (
                   comercios.map((comercio) => (
-                    <label key={comercio.tenant_id} className="text-sm flex gap-2 items-center">
+                    <label key={comercio.id} className="text-sm flex gap-2 items-center">
                       <input
                         type="checkbox"
-                        value={comercio.tenant_id}
-                        checked={form.comercioIds.includes(comercio.tenant_id)}
+                        value={comercio.id}
+                        checked={form.comercioIds.includes(comercio.id)}
                         onChange={handleCheckboxChange}
                       />
                       {comercio.nombre} ({comercio.direccion})
@@ -145,15 +139,23 @@ export default function RegisterPage() {
             </div>
           )}
 
-          <button
-            type="submit"
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg font-semibold transition"
-          >
-            Registrarse
-          </button>
+          <div className="flex justify-between gap-3 mt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-full bg-gray-300 text-gray-700 py-2 rounded hover:bg-gray-400"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+            >
+              Crear
+            </button>
+          </div>
         </form>
       </div>
     </div>
   );
 }
-

@@ -9,8 +9,10 @@ import CreatePromotionPage from '../pages/CreatePromotionPage';
 import EditPromotionPage from '../pages/EditPromotionPage';
 import PrivateLayout from '../layouts/PrivateLayout';
 import PublicLayout from '../layouts/PublicLayout'; 
-import RegisterPage from '../pages/RegisterPage'; 
+import RegisterPage from '../pages/UsersPage'; 
 import CreateTenantPage from '../pages/CreateTenantPage'; 
+import CreateCommercePage from '../pages/CreateCommercePage';
+import EditUserPage from '../pages/UsersPage';
 
 
 
@@ -22,7 +24,7 @@ export default function AppRouter() {
         <Route element={<PublicLayout />}>
           <Route path="/" element={<LoginPage />} /> 
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/crear-tenant" element={<CreateTenantPage />} />
         </Route>
 
         {/* Layout privado para usuarios logueados */}
@@ -34,7 +36,8 @@ export default function AppRouter() {
           <Route path="/promociones" element={<PromotionsPage />} />
           <Route path="/promociones/create" element={<CreatePromotionPage />} />
           <Route path="/promociones/edit/:id" element={<EditPromotionPage />} />
-          <Route path="/crear-tenant" element={<CreateTenantPage />} />
+          <Route path="/usuarios" element={<EditUserPage/>} />
+          <Route path="/crear-comercio" element={<CreateCommercePage/>} />
         </Route>
 
       </Routes>

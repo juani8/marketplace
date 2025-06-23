@@ -47,4 +47,17 @@ export const register = async (form) => {
   return response.data;
 };
 
+export const registerInternalAdmin = async ({ tenant_id, email, password, nombre }) => {
+  const payload = {
+    tenant_id,
+    email,
+    password,
+    nombre,
+    rol: 'admin'
+  };
+
+  const response = await api.post('/auth/register-internal', payload);
+  return response.data;
+};
+
 
