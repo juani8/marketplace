@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTenant } from '../contexts/TenantContext';
 import { getAllPromotions, deletePromotion } from '../apis/promotionsService';
 import ButtonAdd from '../components/ButtonAdd';
 import PromotionsTable from '../components/PromotionsTable';
-import SuccessModal from '../components/SuccessModal'; // 👈 agregá esto
+import SuccessModal from '../components/SuccessModal';
 
 export default function PromotionsPage() {
   const [promociones, setPromociones] = useState([]);
@@ -11,11 +12,13 @@ export default function PromotionsPage() {
   const [showModal, setShowModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const navigate = useNavigate();
+  const { tenantId } = useTenant();
 
   useEffect(() => {
     async function fetchPromos() {
+      if (!tenantId) return;
       try {
-        const promos = await getAllPromotions();
+        const promos = await getAllPromotions(tenantId);
         setPromociones(promos);
       } catch (err) {
         console.error('Error al cargar promociones:', err);
@@ -23,9 +26,8 @@ export default function PromotionsPage() {
         setIsLoading(false);
       }
     }
-
     fetchPromos();
-  }, []);
+  }, [tenantId]); 
 
   const handleEdit = (promo) => {
     navigate(`/promociones/edit/${promo.promocion_id}`);
@@ -37,7 +39,9 @@ export default function PromotionsPage() {
 
     try {
       await deletePromotion(promo.promocion_id);
-      setPromociones((prev) => prev.filter(p => p.promocion_id !== promo.promocion_id));
+      setPromociones((prev) =>
+        prev.filter((p) => p.promocion_id !== promo.promocion_id)
+      );
       setSuccessMessage(`"${promo.nombre}" eliminada correctamente`);
       setShowModal(true);
     } catch (err) {
@@ -74,7 +78,7 @@ export default function PromotionsPage() {
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         successMessage={successMessage}
-        redirectTo="/promociones"
+        redirectTo={`/promociones`}
       />
     </div>
   );
