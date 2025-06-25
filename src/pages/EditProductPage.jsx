@@ -144,10 +144,10 @@ export default function EditProductPage() {
         isOpen={showModal}
         onClose={() => {
           setShowModal(false);
-          navigate('/products');
-      }}
+          navigate(`/products/${formData.comercio_id}`);
+        }}
         successMessage="¡Producto modificado exitosamente!"
-        redirectTo={`/products`}
+        redirectTo={`/products/${formData.comercio_id}`}
         buttonText="Volver al Catálogo"
       />
     </div>

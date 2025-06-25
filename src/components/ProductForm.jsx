@@ -29,14 +29,14 @@ export default function ProductForm({
     const errors = [];
 
     if (step === 1) {
-      if (!formData.nombre.trim()) errors.push('El campo Nombre es obligatorio.');
+      if (!formData.nombre_producto.trim()) errors.push('El campo Nombre es obligatorio.');
       if (!formData.descripcion.trim()) errors.push('El campo Descripción es obligatorio.');
-      if (!formData.categoria.trim()) errors.push('El campo Categoría es obligatorio.');
+      if (!formData.categoria_id || isNaN(formData.categoria_id)) errors.push('El campo Categoría es obligatorio.');
     }
 
     if (step === 2) {
       if (formData.precio === '' || formData.precio < 0) errors.push('El campo Precio es obligatorio.');
-      if (formData.stock === '' || formData.stock < 0) errors.push('El campo Stock es obligatorio.');
+      //if (formData.cantidad_stock === '' || formData.cantidad_stock < 0) {errors.push('El campo Stock es obligatorio.');}
     }
 
     setValidationErrors(errors);
@@ -51,17 +51,9 @@ export default function ProductForm({
     if (type === 'number') {
       let parsedValue = value === '' ? '' : parseFloat(value);
       if (parsedValue < 0 || isNaN(parsedValue)) return;
-
-      if (name === 'stock') {
-        parsedValue = parseInt(parsedValue);
-        if (!Number.isInteger(parsedValue)) return;
-      }
-      if (name === 'categoria') {
-        handleChange({ target: { name, value: Number(value) } });
-        return;
-      }
+      //if (name === 'cantidad_stock') {parsedValue = parseInt(parsedValue);if (!Number.isInteger(parsedValue)) return;}
       handleChange({ target: { name, value: parsedValue } });
-    } else {
+      } else {
       handleChange(e);
     }
   };
@@ -75,6 +67,7 @@ export default function ProductForm({
   };
 
   const handleFinalSubmit = (e) => {
+    console.log('🧪 handleFinalSubmit ejecutado');
     e.preventDefault();
     setShowErrors(true);
     if (validateStep()) handleSubmit(e);
@@ -92,12 +85,13 @@ export default function ProductForm({
     <form onSubmit={handleFinalSubmit} className="bg-white p-6 rounded shadow space-y-6 w-full max-w-5xl mx-auto">
       <StepIndicator
         currentStep={step}
-        steps={['Información del Producto', 'Precios y Stock', 'Finalización']}
+        steps={['Información del Producto', 'Precio', 'Finalización']}
         onStepClick={(target) => target < step && setStep(target)}
       />
 
       {(error || validationErrors.length > 0) && (
         <div className="bg-red-100 border border-red-400 text-red-700 p-4 rounded">
+          <p className="font-semibold">{error}</p>
           <ul className="list-disc list-inside mt-2">
             {validationErrors.map((err, idx) => (
               <li key={idx}>{err}</li>
@@ -110,14 +104,14 @@ export default function ProductForm({
         <>
           <Step title="Información del Producto">
             <InputRowGrid>
-              <Input label="Nombre" name="nombre" value={formData.nombre} onChange={handleChangeWrapper} />
+              <Input label="Nombre" name="nombre_producto" value={formData.nombre_producto} onChange={handleChangeWrapper} />
               <Select
                 label="Categoría"
-                name="categoria"
-                value={formData.categoria}
+                name="categoria_id"
+                value={formData.categoria_id}
                 onChange={handleChangeWrapper}
                 options={categories}
-                hasError={showErrors && !formData.categoria}
+                hasError={showErrors && !formData.categoria_id}
               />
             </InputRowGrid>
             <Input label="Descripción" name="descripcion" value={formData.descripcion} onChange={handleChangeWrapper} />
@@ -131,7 +125,6 @@ export default function ProductForm({
           <Step title="Precios y Stock">
             <InputRowGrid>
               <Input label="Precio" name="precio" type="number" value={formData.precio} onChange={handleChangeWrapper} />
-              <Input label="Stock" name="stock" type="number" value={formData.stock} onChange={handleChangeWrapper} />
             </InputRowGrid>
           </Step>
           <StepNavigation nextStep={handleNext} prevStep={prevStep} />

@@ -59,8 +59,7 @@ export default function ProductTable({
               {visibleColumns.includes('estado') && <th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Estado</th>}
               {visibleColumns.includes('stock') && <th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Stock</th>}
               {visibleColumns.includes('oferta') && <th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">¿En oferta?</th>}
-              {visibleColumns.includes('fecha_creacion') && <th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Creación</th>}
-              {visibleColumns.includes('fecha_actualizacion') && <th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Actualización</th>}
+              {visibleColumns.includes('fecha_creacion') && <th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Fecha de Creación</th>}
               {visibleColumns.includes('acciones') && <th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Acciones</th>}
             </tr>
           </thead>
@@ -101,7 +100,7 @@ export default function ProductTable({
                 )}
                 {visibleColumns.includes('categoria') && (
                   <td className="py-2 px-4">
-                    {producto.categoria?.nombre || <span className="text-gray-400 italic">Sin categoría</span>}
+                    {producto.categoria?.trim() ? producto.categoria : <span className="text-gray-400 italic">Sin categoría</span>}
                   </td>
                 )}
                 {visibleColumns.includes('estado') && (
@@ -114,7 +113,6 @@ export default function ProductTable({
                   <td className="py-2 px-4">{producto.oferta ? 'Sí' : 'No'}</td>
                 )}
                 {visibleColumns.includes('fecha_creacion') && <td className="py-2 px-4">{producto.fecha_creacion}</td>}
-                {visibleColumns.includes('fecha_actualizacion') && <td className="py-2 px-4">{producto.fecha_actualizacion}</td>}
                 {visibleColumns.includes('acciones') && (
                   <td className="py-2 px-4">
                     <TableActions onEdit={() => onEdit(producto)} onDelete={() => onDelete(producto)} />
@@ -206,13 +204,23 @@ export default function ProductTable({
               {visibleColumns.includes('categoria') && (
                 <div className="mb-2">
                   <span className="font-semibold">Categoría:</span>{' '}
-                  {producto.categoria?.nombre || <span className="italic text-gray-500">Sin categoría</span>}
+                  {producto.categoria?.trim() ? producto.categoria : <span className="italic text-gray-500">Sin categoría</span>}
                 </div>
               )}
               {visibleColumns.includes('estado') && (
                 <div className="mb-2">
                   <span className="font-semibold">Estado:</span>{' '}
                   <StateBadge estado={producto.stock > 0 ? 'disponible' : 'no_disponible'} tipo="producto" />
+                </div>
+              )}
+              {visibleColumns.includes('stock') && (
+                <div className="mb-2">
+                  <span className="font-semibold">Stock:</span> {producto.stock}
+                </div>
+              )}
+              {visibleColumns.includes('fecha_creacion') && (
+                <div className="mb-2">
+                  <span className="font-semibold">Creación:</span> {producto.fecha_creacion}
                 </div>
               )}
               {visibleColumns.includes('acciones') && (
