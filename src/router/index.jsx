@@ -26,7 +26,7 @@ export default function AppRouter() {
           <Route path="/perfil" element={<TenantProfilePage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/products/" element={<ProductsCataloguePage />} />
-          <Route path="/products/create/:tenantId" element={<CreateProductPage />} />
+          <Route path="/products/create" element={<CreateProductPage />} />
           <Route path="/products/edit/:tenantId/:productId" element={<EditProductPage />} />
           <Route path="/promociones" element={<PromotionsPage />} />
           <Route path="/promociones/create" element={<CreatePromotionPage />} />
