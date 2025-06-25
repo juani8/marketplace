@@ -1,157 +1,163 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import TenantForm from '../components/TenantForm';
-import SuccessModal from '../components/SuccessModal';
-import { createTenant } from '../apis/tenantsService';
+import api from '@/apis/api_config';
 
 export default function CreateTenantPage() {
-  const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({
-    nombre: '',
-    razon_social: '',
-    cuenta_bancaria: '',
-    datos_contacto: { email: '', tel: '' },
-    direccion: {
-      calle: '',
-      numero: '',
-      ciudad: '',
-      provincia: '',
-      codigo_postal: '',
-      lat: '',
-      lon: ''
-    },
-    configuracion_operativa: {
-      horarios: {
-        lunes: { activo: false, desde: '', hasta: '' },
-        martes: { activo: false, desde: '', hasta: '' },
-        miércoles: { activo: false, desde: '', hasta: '' },
-        jueves: { activo: false, desde: '', hasta: '' },
-        viernes: { activo: false, desde: '', hasta: '' },
-        sábado: { activo: false, desde: '', hasta: '' },
-        domingo: { activo: false, desde: '', hasta: '' },
-      },
-    },
-    estado: 'activo',
-  });
-
   const navigate = useNavigate();
+  const [form, setForm] = useState({
+    nombre_tenant: '',
+    razon_social: '',
+    direccion: '',
+    cuenta_bancaria: '',
+    email: '',
+    password: '',
+    nombre_admin: ''
+  });
   const [error, setError] = useState('');
-  const [showErrors, setShowErrors] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [showModal, setShowModal] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    if (name.includes('.')) {
-      const [parent, child] = name.split('.');
-      setFormData((prev) => ({
-        ...prev,
-        [parent]: { ...prev[parent], [child]: value },
-      }));
-    } else if (name === 'configuracion_operativa.horarios') {
-      setFormData((prev) => ({
-        ...prev,
-        configuracion_operativa: {
-          ...prev.configuracion_operativa,
-          horarios: value,
-        },
-      }));
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
-    }
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
-  
+
     try {
-      const horarios = formData.configuracion_operativa.horarios;
-      const diaActivo = Object.keys(horarios).find((dia) => horarios[dia]?.activo);
-  
-      if (!diaActivo) {
-        throw new Error('Debes configurar al menos un día activo con horarios.');
-      }
-  
-      const horario_apertura = horarios[diaActivo].desde || '09:00';
-      const horario_cierre = horarios[diaActivo].hasta || '18:00';
-      const direccionCompleta = formData.posee_direccion ? formData.direccion : {};
-  
-      const payload = {
-        nombre: formData.nombre,
-        razon_social: formData.razon_social,
-        cuenta_bancaria: formData.cuenta_bancaria,
-        email: formData.datos_contacto.email,
-        telefono: formData.datos_contacto.tel,
-        ...direccionCompleta,
-        horario_apertura,
-        horario_cierre,
-        estado: formData.estado,
-      };
-  
-      console.log('Payload que se envía:', payload);
-      const res = await createTenant(payload);
-      console.log('Respuesta del backend:', res);
-  
-      setShowModal(true);
+      const tenantRes = await api.post('/tenants', {
+        nombre: form.nombre_tenant,
+        razon_social: form.razon_social,
+        direccion: form.direccion,
+        cuenta_bancaria: form.cuenta_bancaria,
+        configuracion_operativa: {
+          horario_apertura: '09:00',
+          horario_cierre: '18:00'
+        }
+      });
+
+      const tenantId = tenantRes.data.tenant_id;
+
+      const userRes = await api.post('/auth/register-internal', {
+        tenant_id: tenantId,
+        nombre: form.nombre_admin,
+        email: form.email,
+        password: form.password,
+        rol: 'admin'
+      });
+
+      localStorage.setItem('user', JSON.stringify(userRes.data));
+      localStorage.setItem('tenant_id', tenantId);
+
+      navigate('/crear-comercio', {
+        state: {
+          tenantId,
+          email: form.email
+        }
+      });
     } catch (err) {
-      console.error('Error al crear el comercio:', err);
-      setError('No se pudo crear el comercio. Verificá los datos ingresados.');
+      console.error(err);
+      setError('No se pudo registrar el tenant.');
     } finally {
       setIsLoading(false);
     }
-  };  
+  };
 
-  const nextStep = async () => {
-  setShowErrors(true);
-  setError('');
-  setShowErrors(false);
-  setStep((prev) => prev + 1);
-};
-
-  const prevStep = () => setStep((prev) => prev - 1);
+  const tenantId = localStorage.getItem('tenant_id');
 
   return (
-    <div className="p-5">
-      <div className="mb-4">
-        <h1 className="text-2xl font-bold text-gray-800">Añadir Comercio</h1>
-      </div>
+    <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100">
+      {tenantId && (
+        <div className="absolute top-4 right-6 text-sm text-gray-600">
+          Tenant ID: <span className="font-mono font-semibold">{tenantId}</span>
+        </div>
+      )}
 
-      <TenantForm
-        formData={formData}
-        handleChange={handleChange}
-        handleSubmit={handleSubmit}
-        step={step}
-        nextStep={nextStep}
-        prevStep={prevStep}
-        error={error}
-        showErrors={showErrors}
-        setShowErrors={setShowErrors}
-        isLoading={isLoading}
-      />
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-8 rounded shadow-md w-full max-w-md"
+      >
+        <h2 className="text-xl font-bold text-center mb-6">Crear Cuenta Tenant</h2>
 
-      <div className="mt-4">
+        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+
+        <input
+          type="text"
+          name="nombre_tenant"
+          placeholder="Nombre del tenant"
+          value={form.nombre_tenant}
+          onChange={handleChange}
+          className="w-full mb-3 p-2 border rounded"
+          required
+        />
+
+        <input
+          type="text"
+          name="razon_social"
+          placeholder="Razón social"
+          value={form.razon_social}
+          onChange={handleChange}
+          className="w-full mb-3 p-2 border rounded"
+        />
+
+        <input
+          type="text"
+          name="direccion"
+          placeholder="Dirección"
+          value={form.direccion}
+          onChange={handleChange}
+          className="w-full mb-3 p-2 border rounded"
+        />
+
+        <input
+          type="text"
+          name="cuenta_bancaria"
+          placeholder="Cuenta bancaria"
+          value={form.cuenta_bancaria}
+          onChange={handleChange}
+          className="w-full mb-3 p-2 border rounded"
+        />
+
+        <input
+          type="text"
+          name="nombre_admin"
+          placeholder="Nombre del admin"
+          value={form.nombre_admin}
+          onChange={handleChange}
+          className="w-full mb-3 p-2 border rounded"
+          required
+        />
+
+        <input
+          type="email"
+          name="email"
+          placeholder="Correo electrónico"
+          value={form.email}
+          onChange={handleChange}
+          className="w-full mb-3 p-2 border rounded"
+          required
+        />
+
+        <input
+          type="password"
+          name="password"
+          placeholder="Contraseña"
+          value={form.password}
+          onChange={handleChange}
+          className="w-full mb-6 p-2 border rounded"
+          required
+        />
+
         <button
-          type="button"
-          onClick={() => setShowModal(false) || navigate('/tenants')}
-          className="text-sm text-gray-500 hover:text-gray-700 underline"
+          type="submit"
+          disabled={isLoading}
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
         >
-          Cancelar y volver al listado
+          {isLoading ? 'Registrando...' : 'Crear Tenant'}
         </button>
-      </div>
-
-      <SuccessModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        successMessage="¡Comercio creado exitosamente!"
-        redirectTo={`/tenants`}
-        buttonText="Volver al Portal de Tenants"
-      />
+      </form>
     </div>
   );
 }
