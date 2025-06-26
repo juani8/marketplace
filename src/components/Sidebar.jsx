@@ -6,6 +6,7 @@ import {
   FaCog,
   FaSignOutAlt,
   FaUserPlus,
+  FaRegCreditCard,
 } from 'react-icons/fa';
 import PropTypes from 'prop-types';
 
@@ -66,18 +67,29 @@ export default function Sidebar({ isCollapsed, toggleSidebar }) {
           {!isCollapsed && <span>Promociones</span>}
         </Link>
 
-        {/* ✅ Solo visible para ADMIN */}
         {isAdmin && (
-          <Link
-            to="/usuarios"
-            className={`flex items-center gap-3 px-2 py-2 rounded hover:bg-blue-600 ${
-              isActive('/editar-user') ? 'bg-blue-700' : ''
-            }`}
-          >
-            <FaUserPlus className="text-xl" />
-            {!isCollapsed && <span>Usuarios</span>}
-          </Link>
-        )}
+  <>
+    <Link
+      to="/usuarios"
+      className={`flex items-center gap-3 px-2 py-2 rounded hover:bg-blue-600 ${
+        isActive('/usuarios') ? 'bg-blue-700' : ''
+      }`}
+    >
+      <FaUserPlus className="text-xl" />
+      {!isCollapsed && <span>Usuarios</span>}
+    </Link>
+
+    <Link
+      to="/billetera"
+      className={`flex items-center gap-3 px-2 py-2 rounded hover:bg-blue-600 ${
+        isActive('/billetera') ? 'bg-blue-700' : ''
+      }`}
+    >
+      <FaRegCreditCard className="text-xl" />
+      {!isCollapsed && <span>Mi billetera</span>}
+    </Link>
+  </>
+)}
 
         <Link
           to="/configuracion"

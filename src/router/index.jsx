@@ -13,6 +13,9 @@ import RegisterPage from '../pages/UsersPage';
 import CreateTenantPage from '../pages/CreateTenantPage'; 
 import CreateCommercePage from '../pages/CreateCommercePage';
 import EditUserPage from '../pages/UsersPage';
+import BilleteraPage from '@pages/BilleteraPage';
+
+
 
 
 
@@ -38,6 +41,7 @@ export default function AppRouter() {
           <Route path="/promociones/edit/:id" element={<EditPromotionPage />} />
           <Route path="/usuarios" element={<EditUserPage/>} />
           <Route path="/crear-comercio" element={<CreateCommercePage/>} />
+          <Route path="/billetera" element={<BilleteraPage />} />
         </Route>
 
       </Routes>

@@ -48,7 +48,13 @@ export default function CreateTenantPage() {
         rol: 'admin'
       });
 
-      localStorage.setItem('user', JSON.stringify(userRes.data));
+      // guardamos userId
+      const fullUser = {
+        ...userRes.data,
+        userId: userRes.data.id  // necesario para createSeller
+      };
+
+      localStorage.setItem('user', JSON.stringify(fullUser));
       localStorage.setItem('tenant_id', tenantId);
 
       navigate('/crear-comercio', {
@@ -65,7 +71,6 @@ export default function CreateTenantPage() {
     }
   };
 
-  const tenantId = localStorage.getItem('tenant_id');
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100">
