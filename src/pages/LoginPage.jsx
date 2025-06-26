@@ -1,44 +1,66 @@
 // src/pages/LoginPage.jsx
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { checkBackendStatus } from '@apis/api_EJEMPLO';
 import AuthForm from '../components/AuthForm';
-import { useTenant } from '../contexts/TenantContext'; // ✅ IMPORTANTE
+import { useTenant } from '../contexts/TenantContext';
+// import { login } from '../apis/authService'; // login real si lo activan luego
+import { checkBackendStatus } from '@apis/api_EJEMPLO'; // opcional si lo querés dejar
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const [backendStatus, setBackendStatus] = useState(null);
-  const [error, setError] = useState(null);
-  const { setUserInfo } = useTenant(); // ✅ USAMOS EL CONTEXTO
+  const { setUserInfo } = useTenant();
+
+  const [error, setError] = useState('');
+  const [backendStatus, setBackendStatus] = useState(null); // opcional si querés el ping al backend
 
   useEffect(() => {
     const fetchBackendStatus = async () => {
       try {
         const status = await checkBackendStatus();
         setBackendStatus(status);
-      } catch (err) {
-        setError('No se pudo conectar al backend');
+      } catch {
+        setBackendStatus(null);
       }
     };
     fetchBackendStatus();
   }, []);
 
-  const handleLogin = ({ email, password }) => {
-    console.log('Login con:', email, password);
+  const handleLogin = async ({ email, password }) => {
+    setError('');
+    console.log('👉 Se ejecutó handleLogin con:', email, password);
 
-    // HARDCODEADO TEMPORAL mientras no tenga autenticación real
-    const mockSession = {
-      userId: 1,
-      rol: 'admin',
-      tenantId: 1,
-      assignedSellers: [],
-    };
+    try {
+      // 🔁 LOGIN MOCKEADO COMBINADO
+      const isAdmin = email.includes('admin');
+      const mockSession = {
+        userId: 1,
+        rol: isAdmin ? 'admin' : 'operador',
+        tenantId: 1,
+        assignedSellers: [],
+        email,
+      };
+      const token = 'mock-token-123';
 
-    localStorage.setItem('usuario_id', mockSession.userId.toString());
-    localStorage.setItem('userInfo', JSON.stringify(mockSession));
-    setUserInfo(mockSession); // ✅ carga el contexto
+      // Si usaran login real:
+      // const { token, user } = await login(email, password);
 
-    navigate('/perfil');
+      // Guardar en localStorage y contexto
+      localStorage.setItem('token', token);
+      localStorage.setItem('usuario_id', mockSession.userId.toString());
+      localStorage.setItem('userInfo', JSON.stringify(mockSession));
+      setUserInfo(mockSession);
+
+      // Redirección por rol
+      if (mockSession.rol === 'admin') {
+        navigate('/crear-tenant');
+      } else {
+        navigate('/perfil');
+      }
+
+    } catch (err) {
+      console.error(err);
+      setError('Credenciales incorrectas. Por favor, verificá e intentá de nuevo.');
+    }
   };
 
   return (
@@ -48,15 +70,13 @@ export default function LoginPage() {
         submitButtonText="Iniciar sesión"
         onSubmit={handleLogin}
         showForgotPassword={true}
+        error={error}
       />
-      <div style={{ marginTop: 16, textAlign: 'center' }}>
-        {error && <span style={{ color: 'red', display: 'block' }}>{error}</span>}
-        {backendStatus && (
-          <span style={{ color: 'green', display: 'block' }}>
-            Backend status: {JSON.stringify(backendStatus)}
-          </span>
-        )}
-      </div>
+      {backendStatus && (
+        <div style={{ marginTop: 16, textAlign: 'center', color: 'green' }}>
+          Backend status: {JSON.stringify(backendStatus)}
+        </div>
+      )}
     </div>
   );
 }

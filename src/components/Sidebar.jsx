@@ -5,6 +5,7 @@ import {
   FaTags,
   FaCog,
   FaSignOutAlt,
+  FaTachometerAlt,
   FaUserPlus,
 } from 'react-icons/fa';
 import PropTypes from 'prop-types';
