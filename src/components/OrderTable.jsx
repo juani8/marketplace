@@ -20,8 +20,11 @@ export default function OrderTable({ orders, filters, setFilters, onSelectOrder 
           >
             <option value="">Todos los estados</option>
             <option value="Pendiente">Pendiente</option>
-            <option value="Entregada">Entregada</option>
+            <option value="Aceptada">Aceptada</option>
+            <option value="Rechazada">Rechazada</option>
             <option value="Cancelada">Cancelada</option>
+            <option value="Listo">Listo</option>
+            <option value="Finalizada">Finalizada</option>
           </select>
 
           <input
