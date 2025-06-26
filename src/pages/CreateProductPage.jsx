@@ -59,7 +59,6 @@ export default function CreateProductPage() {
   };
 
 const handleSubmit = async (e) => {
-  console.log('🚀 handleSubmit ejecutado');
   e.preventDefault();
   setError('');
   setIsLoading(true);
@@ -83,15 +82,12 @@ const handleSubmit = async (e) => {
       imagenes: formData.imagenes.length > 0 ? formData.imagenes : [],
     };
 
-    console.log('✅ tenantId desde contexto:', tenantId);
-    console.log('📦 Payload final:', payload); // te ayuda a debuggear
+    console.log('tenantId desde contexto:', tenantId);
+    console.log('Payload final:', payload);
 
     await createProduct(payload);
     setShowModal(true);
   } catch (err) {
-      console.log('⚠️ Entró al catch de handleSubmit');
-      console.log('🌐 Error completo:', err);
-      console.log('📦 err.response:', err.response);
 
       const mensaje =
         err.response?.data?.message || err.response?.data?.error || err.message || 'Error desconocido';

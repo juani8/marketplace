@@ -21,7 +21,7 @@ export default function ProductsCataloguePage() {
     'nombre',
     'precio',
     'categoria',
-    'estado',
+    //'fecha_creacion',
     'acciones',
   ]);
   const [showColumnSelector, setShowColumnSelector] = useState(false);
@@ -34,10 +34,8 @@ export default function ProductsCataloguePage() {
     'nombre',
     'descripcion',
     'precio',
-    'stock',
     'categoria',
-    'estado',
-    'fecha_creacion',
+    //'fecha_creacion',
     'acciones',
   ];
 
@@ -48,11 +46,9 @@ export default function ProductsCataloguePage() {
     descripcion: 'Descripción',
     precio: 'Precio',
     precio_descuento: 'Precio con Descuento',
-    stock: 'Stock',
     categoria: 'Categoría',
-    estado: 'Estado',
     oferta: '¿En oferta?',
-    fecha_creacion: 'Fecha de Creación',
+    //fecha_creacion: 'Fecha de Creación',
     acciones: 'Acciones',
   };
 
@@ -62,15 +58,15 @@ export default function ProductsCataloguePage() {
 
       try {
         const response = await getAllProductsByTenant(tenantId);
+        console.log('Respuesta del backend:', response);
         const productosFormateados = response.map((p) => ({
           id: parseInt(p.producto_id),
           nombre: p.nombre_producto,
           descripcion: p.descripcion,
           precio: parseFloat(p.precio),
-          stock: p.cantidad_stock,
           categoria: p.categoria?.nombre ?? '-',
           imagenes: p.imagenes || [],
-          fecha_creacion: p.fecha_creacion,
+          //fecha_creacion: p.fecha_creacion,
         }));
         setProductos(productosFormateados);
       } catch (err) {

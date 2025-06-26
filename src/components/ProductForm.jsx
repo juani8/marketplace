@@ -46,7 +46,7 @@ export default function ProductForm({
   const handleChangeWrapper = (e) => {
     const { name, value, type } = e.target;
 
-    if (name === 'estado') return;
+    //if (name === 'estado') return;
 
     if (type === 'number') {
       let parsedValue = value === '' ? '' : parseFloat(value);

@@ -56,70 +56,68 @@ export default function ProductTable({
               {visibleColumns.includes('precio') && <th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Precio</th>}
               {visibleColumns.includes('precio_descuento') && <th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Precio con Descuento</th>}
               {visibleColumns.includes('categoria') && <th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Categoría</th>}
-              {visibleColumns.includes('estado') && <th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Estado</th>}
-              {visibleColumns.includes('stock') && <th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Stock</th>}
               {visibleColumns.includes('oferta') && <th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">¿En oferta?</th>}
               {visibleColumns.includes('fecha_creacion') && <th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Fecha de Creación</th>}
               {visibleColumns.includes('acciones') && <th className="py-3 px-4 sticky top-0 z-10 bg-gray-100">Acciones</th>}
             </tr>
           </thead>
           <tbody>
-            {products.map((producto) => (
-              <tr key={producto.id} className="border-t text-sm">
-                {selectable && (
-                  <td className="py-2 px-4">
-                    <input
-                      type="checkbox"
-                      checked={selectedIds.includes(producto.id)}
-                      onChange={() => onSelectToggle(producto.id)}
-                    />
-                  </td>
-                )}
-                {visibleColumns.includes('id') && <td className="py-2 px-4">{producto.id}</td>}
-                {visibleColumns.includes('imagenes') && (
-                  <td className="py-2 px-4">
-                    {producto.imagenes[0] ? (
-                      <img
-                        src={producto.imagenes[0]}
-                        alt={producto.nombre}
-                        className="w-16 h-16 object-cover rounded cursor-pointer hover:scale-110 transition-transform"
-                        onClick={() => handleImageClick(producto.imagenes, 0)}
+            {products.map((producto) => {
+              return (
+                <tr key={producto.id} className="border-t text-sm">
+                  {selectable && (
+                    <td className="py-2 px-4">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.includes(producto.id)}
+                        onChange={() => onSelectToggle(producto.id)}
                       />
-                    ) : (
-                      <span className="text-gray-400 text-xs">Sin imágenes</span>
-                    )}
-                  </td>
-                )}
-                {visibleColumns.includes('nombre') && <td className="py-2 px-4">{producto.nombre}</td>}
-                {visibleColumns.includes('descripcion') && <td className="py-2 px-4">{producto.descripcion}</td>}
-                {visibleColumns.includes('precio') && <td className="py-2 px-4">${producto.precio.toFixed(2)}</td>}
-                {visibleColumns.includes('precio_descuento') && (
-                  <td className="py-2 px-4">
-                    {producto.precio_descuento ? `$${producto.precio_descuento.toFixed(2)}` : '—'}
-                  </td>
-                )}
-                {visibleColumns.includes('categoria') && (
-                  <td className="py-2 px-4">
-                    {producto.categoria?.trim() ? producto.categoria : <span className="text-gray-400 italic">Sin categoría</span>}
-                  </td>
-                )}
-                {visibleColumns.includes('estado') && (
-                  <td className="py-2 px-4">
-                    <StateBadge estado={producto.stock > 0 ? 'disponible' : 'no_disponible'} tipo="producto" />
-                  </td>
-                )}
-                {visibleColumns.includes('stock') && <td className="py-2 px-4">{producto.stock}</td>}
-                {visibleColumns.includes('oferta') && (
-                  <td className="py-2 px-4">{producto.oferta ? 'Sí' : 'No'}</td>
-                )}
-                {visibleColumns.includes('fecha_creacion') && <td className="py-2 px-4">{producto.fecha_creacion}</td>}
-                {visibleColumns.includes('acciones') && (
-                  <td className="py-2 px-4">
-                    <TableActions onEdit={() => onEdit(producto)} onDelete={() => onDelete(producto)} />
-                  </td>
-                )}
-              </tr>
-            ))}
+                    </td>
+                  )}
+                  {visibleColumns.includes('id') && <td className="py-2 px-4">{producto.id}</td>}
+                  {visibleColumns.includes('imagenes') && (
+                    <td className="py-2 px-4">
+                      {producto.imagenes[0] ? (
+                        <img
+                          src={producto.imagenes[0]}
+                          alt={producto.nombre}
+                          className="w-16 h-16 object-cover rounded cursor-pointer hover:scale-110 transition-transform"
+                          onClick={() => handleImageClick(producto.imagenes, 0)}
+                        />
+                      ) : (
+                        <span className="text-gray-400 text-xs">Sin imágenes</span>
+                      )}
+                    </td>
+                  )}
+                  {visibleColumns.includes('nombre') && <td className="py-2 px-4">{producto.nombre}</td>}
+                  {visibleColumns.includes('descripcion') && <td className="py-2 px-4">{producto.descripcion}</td>}
+                  {visibleColumns.includes('precio') && <td className="py-2 px-4">${producto.precio.toFixed(2)}</td>}
+                  {visibleColumns.includes('precio_descuento') && (
+                    <td className="py-2 px-4">
+                      {producto.precio_descuento ? `$${producto.precio_descuento.toFixed(2)}` : '—'}
+                    </td>
+                  )}
+                  {visibleColumns.includes('categoria') && (
+                    <td className="py-2 px-4">
+                      {producto.categoria?.trim()
+                        ? producto.categoria
+                        : <span className="text-gray-400 italic">Sin categoría</span>}
+                    </td>
+                  )}
+                  {visibleColumns.includes('oferta') && (
+                    <td className="py-2 px-4">{producto.oferta ? 'Sí' : 'No'}</td>
+                  )}
+                  {visibleColumns.includes('fecha_creacion') && (
+                    <td className="py-2 px-4">{producto.fecha_creacion}</td>
+                  )}
+                  {visibleColumns.includes('acciones') && (
+                    <td className="py-2 px-4">
+                      <TableActions onEdit={() => onEdit(producto)} onDelete={() => onDelete(producto)} />
+                    </td>
+                  )}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -205,17 +203,6 @@ export default function ProductTable({
                 <div className="mb-2">
                   <span className="font-semibold">Categoría:</span>{' '}
                   {producto.categoria?.trim() ? producto.categoria : <span className="italic text-gray-500">Sin categoría</span>}
-                </div>
-              )}
-              {visibleColumns.includes('estado') && (
-                <div className="mb-2">
-                  <span className="font-semibold">Estado:</span>{' '}
-                  <StateBadge estado={producto.stock > 0 ? 'disponible' : 'no_disponible'} tipo="producto" />
-                </div>
-              )}
-              {visibleColumns.includes('stock') && (
-                <div className="mb-2">
-                  <span className="font-semibold">Stock:</span> {producto.stock}
                 </div>
               )}
               {visibleColumns.includes('fecha_creacion') && (
