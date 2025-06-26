@@ -20,21 +20,6 @@ export function TenantProvider({ children }) {
   const [tenantId, setTenantId] = useState(initialUserInfo.tenantId);
   const [assignedSellers, setAssignedSellers] = useState(initialUserInfo.assignedSellers || []);
 
-  // selectedSeller persiste en localStorage
-  const storedSeller = localStorage.getItem('selectedSeller');
-  const [selectedSeller, _setSelectedSeller] = useState(
-    storedSeller ? JSON.parse(storedSeller) : null
-  );
-
-  const setSelectedSeller = (seller) => {
-    if (seller) {
-      localStorage.setItem('selectedSeller', JSON.stringify(seller));
-    } else {
-      localStorage.removeItem('selectedSeller');
-    }
-    _setSelectedSeller(seller);
-  };
-
   // Persistir automáticamente cuando cambia cualquier dato de sesión
   useEffect(() => {
     const userInfo = { userId, rol, tenantId, assignedSellers };
@@ -52,12 +37,10 @@ export function TenantProvider({ children }) {
   // (opcional) Limpiar sesión completa
   const logout = () => {
     localStorage.removeItem('userInfo');
-    localStorage.removeItem('selectedSeller');
     setUserId(null);
     setRol(null);
     setTenantId(null);
     setAssignedSellers([]);
-    _setSelectedSeller(null);
   };
 
   return (
@@ -67,8 +50,6 @@ export function TenantProvider({ children }) {
         rol,
         tenantId,
         assignedSellers,
-        selectedSeller,
-        setSelectedSeller,
         setUserInfo,
         logout,
       }}
