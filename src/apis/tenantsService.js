@@ -1,4 +1,4 @@
-import api from './api_config'; // nuevo
+import api from './api_config'; 
 
 // Obtener todos los tenants
 export const getAllTenants = async () => {
