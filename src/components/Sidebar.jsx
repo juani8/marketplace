@@ -8,6 +8,7 @@ import {
   FaTachometerAlt,
   FaUserPlus,
   FaWarehouse,
+  FaRegCreditCard,
 } from 'react-icons/fa';
 import PropTypes from 'prop-types';
 import { useAuth } from '../contexts/AuthContext';
@@ -75,10 +76,18 @@ export default function Sidebar({ isCollapsed, toggleSidebar, onLogoutClick }) {
           </Link>
         )}
 
-        <Link to="/configuracion" className={`flex items-center gap-3 px-2 py-2 rounded hover:bg-blue-600 ${isActive('/configuracion') ? 'bg-blue-700' : ''}`}>
-          <FaCog className="text-xl" />
-          {!isCollapsed && <span>Configuración</span>}
-        </Link>
+        {isAdmin && (
+            <Link
+              to="/billetera"
+              className={`flex items-center gap-3 px-2 py-2 rounded hover:bg-blue-600 ${
+                isActive('/billetera') ? 'bg-blue-700' : ''
+              }`}
+            >
+              <FaRegCreditCard className="text-xl" />
+              {!isCollapsed && <span>Mi billetera</span>}
+            </Link>
+          )}
+
 
       </nav>
 
