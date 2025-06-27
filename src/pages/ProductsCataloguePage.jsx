@@ -6,6 +6,8 @@ import SearchInput from '../components/SearchInput';
 import ProductTable from '../components/ProductTable';
 import ColumnSelector from '../components/ColumnSelector';
 import SuccessModal from '../components/SuccessModal';
+import ConfirmModal from '../components/ConfirmModal';
+import UploadCSVModal from '../components/UploadCSVModal';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function ProductsCataloguePage() {
@@ -19,9 +21,13 @@ export default function ProductsCataloguePage() {
     const base = ['imagenes', 'id', 'nombre', 'precio', 'categoria'];
     return rol === 'admin' ? [...base, 'acciones'] : base;
   });
+  const [showUploadModal, setShowUploadModal] = useState(false);
   const [showColumnSelector, setShowColumnSelector] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
+
 
   const baseColumns = [
     'id',
@@ -85,20 +91,24 @@ export default function ProductsCataloguePage() {
     navigate(`/products/edit/${product.id}`);
   };
 
-  const handleDelete = async (producto) => {
-    const confirm = window.confirm(`¿Estás seguro que querés eliminar "${producto.nombre}"?`);
-    if (!confirm) return;
+  const confirmDelete = (producto) => {
+    setProductToDelete(producto);
+    setConfirmOpen(true);
+  };
 
+  const handleConfirmDelete = async () => {
+    setConfirmOpen(false);
     try {
-      await deleteProduct(producto.id);
-      setProductos((prev) => prev.filter((p) => p.id !== producto.id));
-      setSuccessMessage(`"${producto.nombre}" eliminado correctamente`);
+      await deleteProduct(productToDelete.id);
+      setProductos((prev) => prev.filter((p) => p.id !== productToDelete.id));
+      setSuccessMessage(`"${productToDelete.nombre}" eliminado correctamente`);
       setShowModal(true);
     } catch (err) {
       console.error('Error al eliminar producto:', err);
       alert('❌ No se pudo eliminar el producto');
     }
   };
+
 
   if (isLoading) {
     return (
@@ -116,10 +126,14 @@ export default function ProductsCataloguePage() {
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0 mb-4">
         <h1 className="text-2xl font-bold text-gray-800">Catálogo de Productos</h1>
         {rol === 'admin' && (
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <ButtonAdd
               onClick={() => navigate(`/products/create`)}
               text="Añadir Producto"
+            />
+            <ButtonAdd
+              onClick={() => setShowUploadModal(true)}
+              text="Cargar por CSV"
             />
             <ButtonAdd
               onClick={() => navigate(`/categories/create`)}
@@ -160,10 +174,31 @@ export default function ProductsCataloguePage() {
         products={filteredProducts}
         visibleColumns={visibleColumns}
         onEdit={handleEdit}
-        onDelete={handleDelete}
+        onDelete={confirmDelete}
         selectable={rol === 'admin'}
         rol={rol}
       />
+
+      {showUploadModal && (
+        <UploadCSVModal
+          onClose={() => setShowUploadModal(false)}
+          onSuccess={(data) => {
+            const nuevos = data?.data?.productos_creados?.map(p => p.producto);
+            if (nuevos?.length > 0) {
+              setProductos(prev => [...prev, ...nuevos.map(p => ({
+                id: parseInt(p.producto_id),
+                nombre: p.nombre_producto,
+                descripcion: p.descripcion,
+                precio: parseFloat(p.precio),
+                categoria: p.categoria?.nombre || '-',
+                imagenes: p.imagenes || [],
+              }))]);
+              setSuccessMessage(`${nuevos.length} producto(s) agregados exitosamente`);
+              setShowModal(true);
+            }
+          }}
+        />
+      )}
 
       <SuccessModal
         isOpen={showModal}
@@ -171,6 +206,13 @@ export default function ProductsCataloguePage() {
         successMessage={successMessage}
         redirectTo={`/products`}
       />
+      <ConfirmModal
+        isOpen={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={handleConfirmDelete}
+        message={`¿Estás seguro de que querés eliminar "${productToDelete?.nombre}"?`}
+      />
+
     </div>
   );
 }

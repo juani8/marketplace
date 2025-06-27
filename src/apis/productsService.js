@@ -22,13 +22,13 @@ export const createProduct = async (formData) => {
   return response.data;
 };
 
-// ✅ Obtener todos los productos de un comercio
+// Obtener todos los productos de un comercio
 export const getAllProducts = async (comercioId) => {
   const res = await api.get(`/sellers/${comercioId}/products`);
-  return res.data.data; // ✅ esto incluye { comercio, productos }
+  return res.data.data; // incluye { comercio, productos }
 };
 
-// ✅ Obtener todos los productos de un tenant (sin filtrar por comercio)
+// Obtener todos los productos de un tenant (sin filtrar por comercio)
 export const getAllProductsByTenant = async (tenantId) => {
   const response = await api.get('/products', {
     headers: {'x-tenant-id': tenantId,},
@@ -79,6 +79,21 @@ export const deleteProduct = async (productId) => {
   const response = await api.delete(`/products/${productId}`);
   return response.data;
 };
+
+// Subir CSV de productos
+export const uploadProductsCSV = async (formData) => {
+  return await api.post('/products/csv/upload', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+};
+// Obtener template CSV
+export const getCSVTemplate = async () => {
+  return await api.get('/products/csv/template');
+};
+
+// CONTROL DE STOCK
 
 // Actualizar el stock de un producto en un comercio
 export const updateStock = async (comercioId, productoId, cantidad) => {
