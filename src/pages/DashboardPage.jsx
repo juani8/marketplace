@@ -11,6 +11,8 @@ import { useAuth } from '../contexts/AuthContext';
 export default function DashboardPage() {
   const { rol, userId } = useAuth(); 
   const [selectedSeller, setSelectedSeller] = useState(null);
+  const [fechaError, setFechaError] = useState('');
+
 
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
@@ -43,24 +45,37 @@ export default function DashboardPage() {
     fetchOrders();
   }, [selectedSeller]);
 
-  useEffect(() => {
-    const filtered = orders.filter(order => {
-      const matchEstado = filters.estado ? order.estado === filters.estado : true;
-      const matchCliente = filters.cliente
-        ? order.cliente?.toLowerCase().includes(filters.cliente.toLowerCase())
-        : true;
-      const matchDesde = filters.desde ? new Date(order.fecha) >= new Date(filters.desde) : true;
-      const matchHasta = filters.hasta ? new Date(order.fecha) <= new Date(filters.hasta) : true;
+useEffect(() => {
+  if (filters.desde && filters.hasta) {
+    const desdeDate = new Date(filters.desde);
+    const hastaDate = new Date(filters.hasta);
 
-      return matchEstado && matchCliente && matchDesde && matchHasta;
-    });
+    if (desdeDate > hastaDate) {
+      setFechaError('La fecha de inicio debe ser anterior o igual a la fecha de fin.');
+      setFilteredOrders([]);
+      return;
+    } else {
+      setFechaError('');
+    }
+  }
 
-    setFilteredOrders(filtered);
-  }, [filters, orders]);
+  const filtered = orders.filter(order => {
+    const matchEstado = filters.estado ? order.estado === filters.estado : true;
+    const matchCliente = filters.cliente
+      ? order.cliente?.toLowerCase().includes(filters.cliente.toLowerCase())
+      : true;
+    const matchDesde = filters.desde ? new Date(order.fechaISO) >= new Date(filters.desde) : true;
+    const matchHasta = filters.hasta ? new Date(order.fechaISO) <= new Date(filters.hasta) : true;
+
+    return matchEstado && matchCliente && matchDesde && matchHasta;
+  });
+
+  setFilteredOrders(filtered);
+}, [filters, orders]);
 
   return (
     <div className="p-5">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Dashboard de Órdenes</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">Resumen de Órdenes</h1>
 
       {/* Selector de comercio */}
       <div className="mb-6">
@@ -80,6 +95,11 @@ export default function DashboardPage() {
               <OrderMetrics orders={orders} />
             </div>
           </div>
+          {fechaError && (
+            <div className="text-red-600 text-sm mb-4">
+              {fechaError}
+            </div>
+          )}
           
           <OrderTable
             orders={filteredOrders}

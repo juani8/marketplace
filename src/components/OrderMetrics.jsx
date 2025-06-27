@@ -32,7 +32,9 @@ export default function OrderMetrics({ orders }) {
     }
   });
 
-  const totalVentas = orders.reduce((sum, o) => sum + o.total, 0);
+  const totalVentas = orders
+  .filter(o => o.estado === 'Finalizada')
+  .reduce((sum, o) => sum + o.total, 0);
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">

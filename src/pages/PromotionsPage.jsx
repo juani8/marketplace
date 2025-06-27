@@ -5,12 +5,15 @@ import { getAllPromotions, deletePromotion } from '../apis/promotionsService';
 import ButtonAdd from '../components/ButtonAdd';
 import PromotionsTable from '../components/PromotionsTable';
 import SuccessModal from '../components/SuccessModal';
+import ConfirmModal from '../components/ConfirmModal';
 
 export default function PromotionsPage() {
   const [promociones, setPromociones] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [promoToDelete, setPromoToDelete] = useState(null);
   const navigate = useNavigate();
   const { tenantId, rol } = useAuth();
 
@@ -33,16 +36,19 @@ export default function PromotionsPage() {
     navigate(`/promociones/edit/${promo.promocion_id}`);
   };
 
-  const handleDelete = async (promo) => {
-    const confirm = window.confirm(`¿Estás seguro que querés eliminar "${promo.nombre}"?`);
-    if (!confirm) return;
+  const confirmDelete = (promo) => {
+    setPromoToDelete(promo);
+    setConfirmOpen(true);
+  };
 
+  const handleConfirmDelete = async () => {
+    setConfirmOpen(false);
     try {
-      await deletePromotion(promo.promocion_id);
+      await deletePromotion(promoToDelete.promocion_id);
       setPromociones((prev) =>
-        prev.filter((p) => p.promocion_id !== promo.promocion_id)
+        prev.filter((p) => p.promocion_id !== promoToDelete.promocion_id)
       );
-      setSuccessMessage(`"${promo.nombre}" eliminada correctamente`);
+      setSuccessMessage(`"${promoToDelete.nombre}" eliminada correctamente`);
       setShowModal(true);
     } catch (err) {
       console.error('❌ Error al eliminar promoción:', err);
@@ -73,7 +79,7 @@ export default function PromotionsPage() {
       <PromotionsTable
         promotions={promociones}
         onEdit={handleEdit}
-        onDelete={handleDelete}
+        onDelete={confirmDelete}
       />
 
       <SuccessModal
@@ -81,6 +87,12 @@ export default function PromotionsPage() {
         onClose={() => setShowModal(false)}
         successMessage={successMessage}
         redirectTo={`/promociones`}
+      />
+      <ConfirmModal
+        isOpen={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={handleConfirmDelete}
+        message={`¿Estás seguro de que querés eliminar la promoción "${promoToDelete?.nombre}"?`}
       />
     </div>
   );
