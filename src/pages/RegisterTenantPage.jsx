@@ -11,9 +11,17 @@ export default function RegisterTenantPage() {
     razon_social: '',
     cuenta_bancaria: '',
     email: '',
+    telefono: '',
+    calle: '',
+    numero: '',
+    ciudad: '',
+    provincia: '',
+    codigo_postal: '',
+    sitio_web: '',
+    instagram: '',
     password: '',
-    nombre_admin: ''
-  });
+    nombre_admin: '', // será usado como 'nombre_usuario'
+    });
 
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -106,19 +114,43 @@ export default function RegisterTenantPage() {
           Registrar Tenant
         </h2>
 
-        <InputGroup
-          fields={[
-            { name: 'nombre', label: 'Nombre del negocio' },
-            { name: 'razon_social', label: 'Razón social' },
-            { name: 'cuenta_bancaria', label: 'Cuenta bancaria' },
-            { name: 'nombre_admin', label: 'Nombre del administrador' },
-            { name: 'email', label: 'Correo electrónico', type: 'email' },
-            { name: 'password', label: 'Contraseña', type: 'password' }
-          ]}
-          form={form}
-          handleChange={handleChange}
-          errors={errors}
-        />
+      <InputGroup
+        sections={[
+          {
+            title: 'Datos del Negocio',
+            fields: [
+              { name: 'nombre', label: 'Nombre del negocio' },
+              { name: 'razon_social', label: 'Razón social' },
+              { name: 'cuenta_bancaria', label: 'Cuenta bancaria' },
+              { name: 'email', label: 'Correo electrónico', type: 'email' },
+              { name: 'telefono', label: 'Teléfono' },
+            ],
+          },
+          {
+            title: 'Datos del Administrador',
+            fields: [
+              { name: 'nombre_admin', label: 'Nombre de usuario (admin)' },
+              { name: 'password', label: 'Contraseña', type: 'password' },
+            ],
+          },
+          {
+            title: 'Dirección y Contacto',
+            fields: [
+              { name: 'calle', label: 'Calle' },
+              { name: 'numero', label: 'Número' },
+              { name: 'ciudad', label: 'Ciudad' },
+              { name: 'provincia', label: 'Provincia' },
+              { name: 'codigo_postal', label: 'Código postal' },
+              { name: 'sitio_web', label: 'Sitio web (opcional)' },
+              { name: 'instagram', label: 'Instagram (opcional)' },
+            ],
+          },
+        ]}
+        form={form}
+        handleChange={handleChange}
+        errors={errors}
+      />
+
 
         <div className="mt-8">
           <Button
@@ -141,26 +173,35 @@ export default function RegisterTenantPage() {
   );
 }
 
-function InputGroup({ fields, form, handleChange, errors }) {
+function InputGroup({ sections, form, handleChange, errors }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {fields.map(({ name, label, type = 'text' }) => (
-        <div key={name}>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            {label}
-          </label>
-          <input
-            type={name === 'cuenta_bancaria' ? 'tel' : type}
-            inputMode={name === 'cuenta_bancaria' ? 'numeric' : undefined}
-            pattern={name === 'cuenta_bancaria' ? '\\d*' : undefined}
-            name={name}
-            value={form[name]}
-            onChange={handleChange}
-            className={`w-full border rounded-lg px-3 py-2 text-sm text-left focus:outline-none focus:ring-2 focus:ring-blue-300 ${errors[name] ? 'border-red-500' : ''}`}
-          />
-          {errors[name] && (
-            <p className="text-red-500 text-xs mt-1">{errors[name]}</p>
-          )}
+    <div className="space-y-8">
+      {sections.map(({ title, fields }) => (
+        <div key={title}>
+          <h3 className="text-lg font-semibold text-gray-700 mb-4">{title}</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {fields.map(({ name, label, type = 'text' }) => (
+              <div key={name}>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {label}
+                </label>
+                <input
+                  type={name === 'cuenta_bancaria' ? 'tel' : type}
+                  inputMode={name === 'cuenta_bancaria' ? 'numeric' : undefined}
+                  pattern={name === 'cuenta_bancaria' ? '\\d*' : undefined}
+                  name={name}
+                  value={form[name]}
+                  onChange={handleChange}
+                  className={`w-full border rounded-lg px-3 py-2 text-sm text-left focus:outline-none focus:ring-2 focus:ring-blue-300 ${
+                    errors[name] ? 'border-red-500' : ''
+                  }`}
+                />
+                {errors[name] && (
+                  <p className="text-red-500 text-xs mt-1">{errors[name]}</p>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       ))}
     </div>
@@ -168,8 +209,8 @@ function InputGroup({ fields, form, handleChange, errors }) {
 }
 
 InputGroup.propTypes = {
-  fields: PropTypes.array.isRequired,
+  sections: PropTypes.array.isRequired,
   form: PropTypes.object.isRequired,
   handleChange: PropTypes.func.isRequired,
-  errors: PropTypes.object
+  errors: PropTypes.object,
 };
