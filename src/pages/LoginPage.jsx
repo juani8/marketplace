@@ -31,26 +31,24 @@ export default function LoginPage() {
       const { user, tokens } = response;
       const { accessToken, refreshToken } = tokens;
 
-      // Guardar tokens por separado
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
 
-      // Sesión principal
       const sessionInfo = {
         usuarioId: user.usuario_id,
         nombre: user.nombre,
         email: user.email,
         rol: user.rol,
         tenantId: user.tenant_id,
-        assignedSellers: user.assigned_sellers || [],
+        comercios: user.comercios || [], // ✅ necesario para AuthContext
         accessToken,
         refreshToken
       };
+      console.log('📦 sessionInfo guardado:', sessionInfo);
 
       localStorage.setItem('sessionInfo', JSON.stringify(sessionInfo));
       setSessionInfo(sessionInfo);
 
-      // Redirigir según el rol
       if (user.rol === 'admin') {
         navigate('/sellers');
       } else {
@@ -62,6 +60,7 @@ export default function LoginPage() {
       setError('Credenciales incorrectas. Por favor, verificá e intentá de nuevo.');
     }
   };
+
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">

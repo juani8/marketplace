@@ -3,7 +3,6 @@ import { createContext, useContext, useState, useEffect } from 'react';
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  // ✅ Leer sesión desde localStorage
   const storedSessionInfo = localStorage.getItem('sessionInfo');
   const storedAccessToken = localStorage.getItem('accessToken');
   const storedRefreshToken = localStorage.getItem('refreshToken');
@@ -16,7 +15,7 @@ export function AuthProvider({ children }) {
         email: '',
         rol: null,
         tenantId: null,
-        assignedSellers: [],
+        comercios: [],
       };
 
   const [usuarioId, setUsuarioId] = useState(initialSession.usuarioId);
@@ -24,11 +23,10 @@ export function AuthProvider({ children }) {
   const [email, setEmail] = useState(initialSession.email);
   const [rol, setRol] = useState(initialSession.rol);
   const [tenantId, setTenantId] = useState(initialSession.tenantId);
-  const [assignedSellers, setAssignedSellers] = useState(initialSession.assignedSellers || []);
+  const [comercios, setComercios] = useState(initialSession.comercios || []);
   const [accessToken, setAccessToken] = useState(storedAccessToken || null);
   const [refreshToken, setRefreshToken] = useState(storedRefreshToken || null);
 
-  // ✅ Guardar en localStorage cuando cambia algo
   useEffect(() => {
     const sessionInfo = {
       usuarioId,
@@ -36,21 +34,20 @@ export function AuthProvider({ children }) {
       email,
       rol,
       tenantId,
-      assignedSellers
+      comercios
     };
     localStorage.setItem('sessionInfo', JSON.stringify(sessionInfo));
     if (accessToken) localStorage.setItem('accessToken', accessToken);
     if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
-  }, [usuarioId, nombre, email, rol, tenantId, assignedSellers, accessToken, refreshToken]);
+  }, [usuarioId, nombre, email, rol, tenantId, comercios, accessToken, refreshToken]);
 
-  // ✅ Setter global de sesión
   const setSessionInfo = ({
     usuarioId,
     nombre,
     email,
     rol,
     tenantId,
-    assignedSellers,
+    comercios,
     accessToken,
     refreshToken
   }) => {
@@ -59,12 +56,11 @@ export function AuthProvider({ children }) {
     if (email !== undefined) setEmail(email);
     if (rol !== undefined) setRol(rol);
     if (tenantId !== undefined) setTenantId(tenantId);
-    if (assignedSellers !== undefined) setAssignedSellers(assignedSellers || []);
+    if (comercios !== undefined) setComercios(comercios || []);
     if (accessToken) setAccessToken(accessToken);
     if (refreshToken) setRefreshToken(refreshToken);
   };
 
-  // ✅ Logout
   const logout = () => {
     localStorage.clear();
     setUsuarioId(null);
@@ -72,7 +68,7 @@ export function AuthProvider({ children }) {
     setEmail('');
     setRol(null);
     setTenantId(null);
-    setAssignedSellers([]);
+    setComercios([]);
     setAccessToken(null);
     setRefreshToken(null);
   };
@@ -85,7 +81,7 @@ export function AuthProvider({ children }) {
         email,
         rol,
         tenantId,
-        assignedSellers,
+        comercios,
         accessToken,
         refreshToken,
         setSessionInfo,
