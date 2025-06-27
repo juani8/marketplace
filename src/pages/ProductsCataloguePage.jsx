@@ -6,40 +6,35 @@ import SearchInput from '../components/SearchInput';
 import ProductTable from '../components/ProductTable';
 import ColumnSelector from '../components/ColumnSelector';
 import SuccessModal from '../components/SuccessModal';
-import { useTenant } from '../contexts/TenantContext';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function ProductsCataloguePage() {
   const navigate = useNavigate();
-  const { tenantId } = useTenant();
+  const { tenantId, rol } = useAuth();
 
   const [productos, setProductos] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [visibleColumns, setVisibleColumns] = useState([
-    'imagenes',
-    'id',
-    'nombre',
-    'precio',
-    'categoria',
-    //'fecha_creacion',
-    'acciones',
-  ]);
+  const [visibleColumns, setVisibleColumns] = useState(() => {
+    const base = ['imagenes', 'id', 'nombre', 'precio', 'categoria'];
+    return rol === 'admin' ? [...base, 'acciones'] : base;
+  });
   const [showColumnSelector, setShowColumnSelector] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
 
-  const allColumns = [
+  const baseColumns = [
     'id',
     'imagenes',
     'nombre',
     'descripcion',
     'precio',
     'categoria',
-    //'fecha_creacion',
-    'acciones',
+    // 'acciones' la agregamos condicionalmente más abajo
   ];
+  const allColumns = rol === 'admin' ? [...baseColumns, 'acciones'] : baseColumns;
 
-  const columnLabels = {
+  const fullLabels = {
     id: 'ID',
     imagenes: 'Imagen',
     nombre: 'Nombre',
@@ -48,9 +43,11 @@ export default function ProductsCataloguePage() {
     precio_descuento: 'Precio con Descuento',
     categoria: 'Categoría',
     oferta: '¿En oferta?',
-    //fecha_creacion: 'Fecha de Creación',
     acciones: 'Acciones',
   };
+  const columnLabels = rol === 'admin'
+    ? fullLabels
+    : Object.fromEntries(Object.entries(fullLabels).filter(([key]) => key !== 'acciones'));
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -64,11 +61,12 @@ export default function ProductsCataloguePage() {
           nombre: p.nombre_producto,
           descripcion: p.descripcion,
           precio: parseFloat(p.precio),
-          categoria: p.categoria?.nombre ?? '-',
+          categoria: typeof p.categoria === 'object' ? p.categoria?.nombre : p.categoria || '-',
           imagenes: p.imagenes || [],
-          //fecha_creacion: p.fecha_creacion,
         }));
         setProductos(productosFormateados);
+        console.log('🧪 Productos formateados con categoría:', productosFormateados);
+
       } catch (err) {
         console.error('Error cargando productos:', err);
       } finally {
@@ -117,10 +115,18 @@ export default function ProductsCataloguePage() {
     <div className="p-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0 mb-4">
         <h1 className="text-2xl font-bold text-gray-800">Catálogo de Productos</h1>
-        <ButtonAdd
-          onClick={() => navigate(`/products/create`)}
-          text="Añadir Producto"
-        />
+        {rol === 'admin' && (
+          <div className="flex gap-2">
+            <ButtonAdd
+              onClick={() => navigate(`/products/create`)}
+              text="Añadir Producto"
+            />
+            <ButtonAdd
+              onClick={() => navigate(`/categories/create`)}
+              text="Crear Categoría"
+            />
+          </div>
+        )}
       </div>
 
       <div className="flex flex-wrap gap-4 items-center mb-4">
@@ -155,6 +161,8 @@ export default function ProductsCataloguePage() {
         visibleColumns={visibleColumns}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        selectable={rol === 'admin'}
+        rol={rol}
       />
 
       <SuccessModal

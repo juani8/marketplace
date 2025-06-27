@@ -1,110 +1,109 @@
 import PropTypes from 'prop-types';
+import { useState, useEffect } from 'react';
+
+const diasSemana = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
+
+const halfHourOptions = (() => {
+  const opciones = [];
+  for (let h = 0; h < 24; h++) {
+    for (let m of [0, 30]) {
+      const hora = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+      opciones.push(hora);
+    }
+  }
+  return opciones;
+})();
+
+const formatearHora = (hora) => {
+  if (!hora) return '';
+  return hora.length >= 5 ? hora.slice(0, 5) : hora;
+};
 
 export default function ScheduleInput({ horarios, onChange }) {
-  const dias = [
-    'lunes',
-    'martes',
-    'miércoles',
-    'jueves',
-    'viernes',
-    'sábado',
-    'domingo',
-  ];
+  const [localHorarios, setLocalHorarios] = useState({});
 
-  const horas = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
-  const minutos = ['00', '30'];
+  useEffect(() => {
+    // Formateamos todas las horas al montar o al actualizar `horarios`
+    const formateado = {};
+    for (const dia of diasSemana) {
+      const config = horarios[dia] || {};
+      formateado[dia] = {
+        activo: config.activo || false,
+        desde: formatearHora(config.desde || '10:00'),
+        hasta: formatearHora(config.hasta || '20:00'),
+      };
+    }
+    setLocalHorarios(formateado);
+  }, [horarios]);
 
-  const handleCheck = (dia, checked) => {
-    const nuevos = {
-      ...horarios,
+  const handleToggle = (dia) => {
+    const yaActivo = localHorarios[dia]?.activo;
+
+    const updated = {
+      ...localHorarios,
       [dia]: {
-        ...horarios[dia],
-        activo: checked,
+        ...localHorarios[dia],
+        activo: !yaActivo,
       },
     };
-    onChange(nuevos);
+
+    setLocalHorarios(updated);
+    onChange(updated);
   };
 
-  const handleHorarioChange = (dia, tipo, valor) => {
-    const nuevos = {
-      ...horarios,
+  const handleTimeChange = (dia, campo, valor) => {
+    const updated = {
+      ...localHorarios,
       [dia]: {
-        ...horarios[dia],
-        [tipo]: valor,
+        ...localHorarios[dia],
+        [campo]: valor,
       },
     };
-    onChange(nuevos);
+    setLocalHorarios(updated);
+    onChange(updated);
   };
 
   return (
-    <div className="mt-6">
-      <label className="block font-medium mb-2">Horarios por día</label>
-      <div className="space-y-2">
-        {dias.map((dia) => (
+    <div className="space-y-4">
+      {diasSemana.map((dia) => {
+        const config = localHorarios[dia] || { activo: false, desde: '', hasta: '' };
+        return (
           <div key={dia} className="flex items-center gap-4">
+            <label className="capitalize w-24">{dia}</label>
             <input
               type="checkbox"
-              checked={horarios[dia]?.activo || false}
-              onChange={(e) => handleCheck(dia, e.target.checked)}
+              checked={config.activo}
+              onChange={() => handleToggle(dia)}
+              className="form-checkbox"
             />
-            <span className="capitalize w-24">{dia}</span>
-
             <select
-              disabled={!horarios[dia]?.activo}
-              value={horarios[dia]?.desde?.split(':')[0] || '09'}
-              onChange={(e) =>
-                handleHorarioChange(dia, 'desde', `${e.target.value}:${horarios[dia]?.desde?.split(':')[1] || '00'}`)
-              }
+              value={formatearHora(config.desde)}
+              onChange={(e) => handleTimeChange(dia, 'desde', e.target.value)}
               className="border rounded px-2 py-1"
+              disabled={!config.activo}
             >
-              {horas.map((h) => (
-                <option key={h} value={h}>{h}</option>
+              {halfHourOptions.map((hora) => (
+                <option key={`desde-${dia}-${hora}`} value={hora}>
+                  {hora}
+                </option>
               ))}
             </select>
-            :
+            <span>a</span>
             <select
-              disabled={!horarios[dia]?.activo}
-              value={horarios[dia]?.desde?.split(':')[1] || '00'}
-              onChange={(e) =>
-                handleHorarioChange(dia, 'desde', `${horarios[dia]?.desde?.split(':')[0] || '09'}:${e.target.value}`)
-              }
+              value={formatearHora(config.hasta)}
+              onChange={(e) => handleTimeChange(dia, 'hasta', e.target.value)}
               className="border rounded px-2 py-1"
+              disabled={!config.activo}
             >
-              {minutos.map((m) => (
-                <option key={m} value={m}>{m}</option>
-              ))}
-            </select>
-
-            <span className="mx-2">a</span>
-
-            <select
-              disabled={!horarios[dia]?.activo}
-              value={horarios[dia]?.hasta?.split(':')[0] || '18'}
-              onChange={(e) =>
-                handleHorarioChange(dia, 'hasta', `${e.target.value}:${horarios[dia]?.hasta?.split(':')[1] || '00'}`)
-              }
-              className="border rounded px-2 py-1"
-            >
-              {horas.map((h) => (
-                <option key={h} value={h}>{h}</option>
-              ))}
-            </select>
-            :
-            <select
-              disabled={!horarios[dia]?.activo}
-              value={horarios[dia]?.hasta?.split(':')[1] || '00'}
-              onChange={(e) =>
-                handleHorarioChange(dia, 'hasta', `${horarios[dia]?.hasta?.split(':')[0] || '18'}:${e.target.value}`)
-              }
-              className="border rounded px-2 py-1"
-            >
-              {minutos.map((m) => (
-                <option key={m} value={m}>{m}</option>
+              {halfHourOptions.map((hora) => (
+                <option key={`hasta-${dia}-${hora}`} value={hora}>
+                  {hora}
+                </option>
               ))}
             </select>
           </div>
-        ))}
-      </div>
+        );
+      })}
     </div>
   );
 }

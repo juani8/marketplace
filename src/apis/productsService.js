@@ -46,7 +46,6 @@ export const getProductById = async (productId) => {
     nombre_producto: p.nombre_producto,
     precio: p.precio,
     descripcion: p.descripcion,
-    cantidad_stock: p.cantidad_stock,
     categoria_id: p.categoria?.categoria_id || '',
     imagenes: p.imagenes || [],
   };
@@ -60,17 +59,18 @@ export const updateProduct = async (tenantId, formData) => {
   data.append('descripcion', formData.descripcion);
   data.append('precio', formData.precio);
   data.append('categoria_id', formData.categoria_id);
-  data.append('tenant_id', tenantId);
 
-  // ✅ Solo se mandan imágenes nuevas (archivos)
   const nuevasImagenes = formData.imagenes.filter((img) => img instanceof File);
-  if (nuevasImagenes.length > 0) {
-    nuevasImagenes.forEach((file) => {
-      data.append('imagenes', file);
-    });
-  }
+  nuevasImagenes.forEach((file) => {
+    data.append('imagenes', file);
+  });
 
-  const response = await api.patch(`/products/${formData.id}`, data);
+  const response = await api.patch(`/products/${formData.id}`, data, {
+    headers: {
+      'x-tenant-id': tenantId,
+    },
+  });
+
   return response.data;
 };
 

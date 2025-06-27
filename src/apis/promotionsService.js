@@ -9,7 +9,7 @@ export const getAllPromotions = async (tenantId) => {
 };
 
 // Crear promoción
-export const createPromotion = async (formData, tenantId) => {
+export const createPromotion = async (formData) => {
   const payload = {
     nombre: formData.nombre,
     tipo_promocion: formData.tipo_promocion,
@@ -19,12 +19,10 @@ export const createPromotion = async (formData, tenantId) => {
     fecha_fin: formData.fecha_fin,
   };
 
-  const response = await api.post('/promotions', payload, {
-    headers: {'x-tenant-id': tenantId},
-  });
-
+  const response = await api.post('/promotions', payload);
   return response.data;
 };
+
 
   // Actualizar promoción
   export const updatePromotion = async (promotionId, formData) => {

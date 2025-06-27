@@ -6,10 +6,10 @@ import OrderDetailModal from '../components/OrderDetailModal';
 import OrderStatusChart from '../components/OrderStatusChart';
 import { getOrdersByComercio } from '../apis/ordersService';
 import SelectSeller from '../components/SelectSeller';
-import { useTenant } from '../contexts/TenantContext';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function DashboardPage() {
-  const { rol, userId } = useTenant(); 
+  const { rol, userId } = useAuth(); 
   const [selectedSeller, setSelectedSeller] = useState(null);
 
   const [orders, setOrders] = useState([]);

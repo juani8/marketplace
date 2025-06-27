@@ -72,16 +72,10 @@ export default function AuthForm({
         {submitButtonText}
       </button>
 
-      {error && (
-      <p className="text-red-500 text-sm mt-2 text-center">
-      {error}
-    </p>
-)}
-
     <div className="mt-4 text-center">
     <span className="text-sm text-gray-600">¿No tenés cuenta? </span>
     <Link
-      to="/crear-tenant"
+      to="/register-tenant"
       className="text-sm text-blue-600 font-semibold hover:underline ml-1"
     >
       Registrarse

@@ -1,153 +1,117 @@
-import { useLocation, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { createSeller } from '@/apis/sellerService'; 
+import { useNavigate } from 'react-router-dom';
+import SellerForm from '@/components/SellerForm';
+import api from '@/apis/api_config';
 
 export default function CreateCommercePage() {
-  const location = useLocation();
   const navigate = useNavigate();
+  const [step, setStep] = useState(1);
+  const [showErrors, setShowErrors] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [isEditing] = useState(false); // este componente siempre crea, así que true
 
-  // si no llega desde location.state, lo toma de localStorage
-  const tenantId = location.state?.tenantId || localStorage.getItem('tenant_id');
-  const nombreTenant = location.state?.nombreTenant || JSON.parse(localStorage.getItem('user'))?.nombre;
+  // 🟡 Inicializar todos los días como inactivos
+  const crearHorariosIniciales = () => {
+    const dias = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
+    const horarios = {};
+    dias.forEach(dia => {
+      horarios[dia] = {
+        activo: false,
+        desde: '',
+        hasta: ''
+      };
+    });
+    return horarios;
+  };
 
-  const [form, setForm] = useState({
+  const [formData, setFormData] = useState({
     nombre: '',
     calle: '',
     numero: '',
     ciudad: '',
     provincia: '',
     codigo_postal: '',
-    lat: '',
-    lon: '',
+    configuracion_operativa: {
+      horarios: crearHorariosIniciales()
+    }
   });
-
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+
+    // 🟡 Para los horarios (name incluye punto)
+    if (name.includes('configuracion_operativa.horarios')) {
+      setFormData((prev) => ({
+        ...prev,
+        configuracion_operativa: {
+          ...prev.configuracion_operativa,
+          horarios: value
+        }
+      }));
+      return;
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const transformarHorarios = (horariosObj) => {
+    return Object.entries(horariosObj).map(([dia, data]) => ({
+      dia_semana: dia, // como string: 'lunes', 'martes', etc.
+      hora_apertura: data.activo ? data.desde : null,
+      hora_cierre: data.activo ? data.hasta : null,
+      estado: 'activo'
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     setError('');
+
     try {
       const payload = {
-        ...form,
-        lat: parseFloat(form.lat),
-        lon: parseFloat(form.lon),
+        nombre: formData.nombre,
+        calle: formData.calle,
+        numero: formData.numero,
+        ciudad: formData.ciudad,
+        provincia: formData.provincia,
+        codigo_postal: formData.codigo_postal,
+        horarios: transformarHorarios(formData.configuracion_operativa.horarios),
       };
+      console.log('Payload a enviar:', payload);
 
-      await createSeller(payload); // ya incluye `usuario_id` internamente
-
-      setSuccess(true);
-      setTimeout(() => navigate('/perfil'), 2000);
+      await api.post('/sellers', payload);
+      navigate('/sellers');
     } catch (err) {
       console.error(err);
-      setError('Error al crear el comercio.');
+      console.log('📩 Detalle del backend:', err.response?.data); // 👈 Agregá esto
+      setError('Error al crear el comercio. Intenta nuevamente.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-return (
-    <div className="pl-[220px] min-h-screen flex items-center justify-center bg-gray-100 relative">
-      {tenantId && (
-        <div className="absolute top-4 right-6 text-sm text-gray-500">
-          Tenant: <span className="font-mono">{tenantId}</span>
-        </div>
-      )}
-
-      <div className="w-full max-w-2xl p-8 bg-white rounded shadow-md -translate-x-12">
-        <h2 className="text-xl font-semibold mb-4">Registrar nuevo comercio</h2>
-
-        {error && <p className="text-red-500 mb-3">{error}</p>}
-        {success && <p className="text-green-600 mb-3">¡Comercio creado con éxito!</p>}
-
-
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="nombre"
-          value={form.nombre}
-          onChange={handleChange}
-          className="w-full mb-3 p-2 border rounded"
-          placeholder="Nombre del comercio"
-          required
-        />
-        <input
-          type="text"
-          name="calle"
-          value={form.calle}
-          onChange={handleChange}
-          className="w-full mb-3 p-2 border rounded"
-          placeholder="Calle"
-          required
-        />
-        <input
-          type="text"
-          name="numero"
-          value={form.numero}
-          onChange={handleChange}
-          className="w-full mb-3 p-2 border rounded"
-          placeholder="Número"
-          required
-        />
-        <input
-          type="text"
-          name="ciudad"
-          value={form.ciudad}
-          onChange={handleChange}
-          className="w-full mb-3 p-2 border rounded"
-          placeholder="Ciudad"
-          required
-        />
-        <input
-          type="text"
-          name="provincia"
-          value={form.provincia}
-          onChange={handleChange}
-          className="w-full mb-3 p-2 border rounded"
-          placeholder="Provincia"
-          required
-        />
-        <input
-          type="text"
-          name="codigo_postal"
-          value={form.codigo_postal}
-          onChange={handleChange}
-          className="w-full mb-3 p-2 border rounded"
-          placeholder="Código Postal"
-          required
-        />
-        <div className="flex gap-4 mb-3">
-          <input
-            type="text"
-            name="lat"
-            value={form.lat}
-            onChange={handleChange}
-            className="w-full p-2 border rounded"
-            placeholder="Latitud"
-            required
-          />
-          <input
-            type="text"
-            name="lon"
-            value={form.lon}
-            onChange={handleChange}
-            className="w-full p-2 border rounded"
-            placeholder="Longitud"
-            required
-          />
-        </div>
-        <button
-          type="submit"
-          className="w-full mt-2 bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
-        >
-          Crear Comercio
-        </button>
-      </form>
+  return (
+    <div className="py-8 px-4">
+      <h1 className="text-2xl font-bold mb-6">Crear Comercio</h1>
+      <SellerForm
+        formData={formData}
+        handleChange={handleChange}
+        handleSubmit={handleSubmit}
+        step={step}
+        setStep={setStep}
+        nextStep={() => setStep((prev) => prev + 1)}
+        prevStep={() => setStep((prev) => prev - 1)}
+        error={error}
+        showErrors={showErrors}
+        setShowErrors={setShowErrors}
+        isLoading={isLoading}
+        isEditing={isEditing}
+      />
     </div>
-  </div>
-);
+  );
 }
-

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTenant } from '../contexts/TenantContext';
+import { useAuth } from '../contexts/AuthContext';
 import PromotionForm from '../components/PromotionForm';
 import { createPromotion } from '../apis/promotionsService';
 import SuccessModal from '../components/SuccessModal';
@@ -18,7 +18,7 @@ export default function CreatePromotionPage() {
   const [error, setError] = useState('');
   const [showErrors, setShowErrors] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const { tenantId } = useTenant();
+  const { tenantId } = useAuth();
 
   const navigate = useNavigate();
 
@@ -34,7 +34,7 @@ export default function CreatePromotionPage() {
     setIsLoading(true);
     setError('');
     try {
-      await createPromotion(formData, tenantId);
+      await createPromotion(formData);
       setShowModal(true); // ✅ Muestra el modal
     } catch (err) {
       console.error('Error al crear la promoción', err);

@@ -1,17 +1,16 @@
-// src/pages/LoginPage.jsx
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import AuthForm from '../components/AuthForm';
-import { useTenant } from '../contexts/TenantContext';
-// import { login } from '../apis/authService'; // login real si lo activan luego
-import { checkBackendStatus } from '@apis/api_EJEMPLO'; // opcional si lo querés dejar
+import { useAuth } from '../contexts/AuthContext';
+import { login } from '../apis/authService'; // Endpoint real
+import { checkBackendStatus } from '@apis/api_EJEMPLO'; // Opcional
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { setUserInfo } = useTenant();
+  const { setSessionInfo } = useAuth();
 
   const [error, setError] = useState('');
-  const [backendStatus, setBackendStatus] = useState(null); // opcional si querés el ping al backend
+  const [backendStatus, setBackendStatus] = useState(null);
 
   useEffect(() => {
     const fetchBackendStatus = async () => {
@@ -27,34 +26,35 @@ export default function LoginPage() {
 
   const handleLogin = async ({ email, password }) => {
     setError('');
-    console.log('👉 Se ejecutó handleLogin con:', email, password);
-
     try {
-      // 🔁 LOGIN MOCKEADO COMBINADO
-      const isAdmin = email.includes('admin');
-      const mockSession = {
-        userId: 1,
-        rol: isAdmin ? 'admin' : 'operador',
-        tenantId: 1,
-        assignedSellers: [],
-        email,
+      const response = await login(email, password);
+      const { user, tokens } = response;
+      const { accessToken, refreshToken } = tokens;
+
+      // Guardar tokens por separado
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+
+      // Sesión principal
+      const sessionInfo = {
+        usuarioId: user.usuario_id,
+        nombre: user.nombre,
+        email: user.email,
+        rol: user.rol,
+        tenantId: user.tenant_id,
+        assignedSellers: user.assigned_sellers || [],
+        accessToken,
+        refreshToken
       };
-      const token = 'mock-token-123';
 
-      // Si usaran login real:
-      // const { token, user } = await login(email, password);
+      localStorage.setItem('sessionInfo', JSON.stringify(sessionInfo));
+      setSessionInfo(sessionInfo);
 
-      // Guardar en localStorage y contexto
-      localStorage.setItem('token', token);
-      localStorage.setItem('usuario_id', mockSession.userId.toString());
-      localStorage.setItem('userInfo', JSON.stringify(mockSession));
-      setUserInfo(mockSession);
-
-      // Redirección por rol
-      if (mockSession.rol === 'admin') {
-        navigate('/crear-tenant');
+      // Redirigir según el rol
+      if (user.rol === 'admin') {
+        navigate('/sellers');
       } else {
-        navigate('/perfil');
+        navigate('/products');
       }
 
     } catch (err) {
@@ -64,7 +64,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <div className="flex flex-col items-center justify-center min-h-screen">
       <AuthForm
         title="Iniciar sesión"
         submitButtonText="Iniciar sesión"
@@ -73,7 +73,7 @@ export default function LoginPage() {
         error={error}
       />
       {backendStatus && (
-        <div style={{ marginTop: 16, textAlign: 'center', color: 'green' }}>
+        <div className="mt-4 text-center text-green-600">
           Backend status: {JSON.stringify(backendStatus)}
         </div>
       )}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useTenant } from '../contexts/TenantContext';
+import { useAuth } from '../contexts/AuthContext';
 import PromotionForm from '../components/PromotionForm';
 import SuccessModal from '../components/SuccessModal';
 import { getAllPromotions, updatePromotion } from '../apis/promotionsService';
@@ -8,7 +8,7 @@ import { getAllPromotions, updatePromotion } from '../apis/promotionsService';
 export default function EditPromotionPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { tenantId } = useTenant();
+  const { tenantId } = useAuth();
 
   const [formData, setFormData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);

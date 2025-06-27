@@ -6,7 +6,7 @@ import InputRowGrid from './InputRowGrid';
 import Button from './Button';
 import ProductTable from './ProductTable';
 import { getAllProductsByTenant } from '../apis/productsService';
-import { useTenant } from '../contexts/TenantContext';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function PromotionForm({
   formData,
@@ -23,7 +23,7 @@ export default function PromotionForm({
   const [products, setProducts] = useState([]);
   const [isFetchingProducts, setIsFetchingProducts] = useState(true);
 
-  const { tenantId } = useTenant(); // 🔸 nuevo
+  const { tenantId } = useAuth(); // 🔸 nuevo
 
   useEffect(() => {
     if (!formData || !tenantId) return;
@@ -304,8 +304,8 @@ const productosDisponibles = products.filter((p) => {
               ? 'Guardando...'
               : 'Creando...'
             : editingPromotionId
-            ? 'Guardar Cambios'
-            : 'Crear Promoción'}
+            ? 'Guardar'
+            : 'Crear'}
         </Button>
       </div>
     </form>

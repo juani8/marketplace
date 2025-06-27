@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { getSellersByUsuario } from '../apis/sellersService';
-import { useTenant } from '../contexts/TenantContext';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function SelectSeller({ onSelect }) {
-  const { userId } = useTenant();
+  const { userId } = useAuth();
   const [sellers, setSellers] = useState([]);
   const [selectedSellerId, setSelectedSellerId] = useState('');
 

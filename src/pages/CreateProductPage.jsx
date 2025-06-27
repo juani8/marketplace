@@ -4,11 +4,11 @@ import ProductForm from '../components/ProductForm';
 import SuccessModal from '../components/SuccessModal';
 import { createProduct } from '../apis/productsService';
 import { getAllCategories } from '../apis/categoriesService';
-import { useTenant } from '../contexts/TenantContext';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function CreateProductPage() {
   const navigate = useNavigate();
-  const { tenantId } = useTenant();
+  const { tenantId } = useAuth();
 
   const [formData, setFormData] = useState({
     nombre_producto: '',

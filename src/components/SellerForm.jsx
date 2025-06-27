@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import isEqual from 'lodash.isequal';
 import Step from './Step';
 import Input from './Input';
 import Select from './Select';
@@ -20,11 +21,19 @@ export default function ProductForm({
   showErrors,
   setShowErrors,
   isLoading,
-  isEditing,
   categories,
-  hasChanges,
+  isEditing,
 }) {
   const [validationErrors, setValidationErrors] = useState([]);
+  const [hasChanges, setHasChanges] = useState(false);
+  const initialFormDataRef = useRef(formData);
+
+  useEffect(() => {
+    if (isEditing) {
+      const igual = isEqual(formData, initialFormDataRef.current);
+      setHasChanges(!igual);
+    }
+  }, [formData, isEditing]);
 
   const validateStep = () => {
     const errors = [];
@@ -37,7 +46,6 @@ export default function ProductForm({
 
     if (step === 2) {
       if (formData.precio === '' || formData.precio < 0) errors.push('El campo Precio es obligatorio.');
-      //if (formData.cantidad_stock === '' || formData.cantidad_stock < 0) {errors.push('El campo Stock es obligatorio.');}
     }
 
     setValidationErrors(errors);
@@ -47,14 +55,11 @@ export default function ProductForm({
   const handleChangeWrapper = (e) => {
     const { name, value, type } = e.target;
 
-    //if (name === 'estado') return;
-
     if (type === 'number') {
       let parsedValue = value === '' ? '' : parseFloat(value);
       if (parsedValue < 0 || isNaN(parsedValue)) return;
-      //if (name === 'cantidad_stock') {parsedValue = parseInt(parsedValue);if (!Number.isInteger(parsedValue)) return;}
       handleChange({ target: { name, value: parsedValue } });
-      } else {
+    } else {
       handleChange(e);
     }
   };
@@ -68,7 +73,6 @@ export default function ProductForm({
   };
 
   const handleFinalSubmit = (e) => {
-    console.log('🧪 handleFinalSubmit ejecutado');
     e.preventDefault();
     setShowErrors(true);
     if (validateStep()) handleSubmit(e);
@@ -172,15 +176,27 @@ export default function ProductForm({
             </div>
           </Step>
 
-            <StepNavigation
-              prevStep={prevStep}
-              isLast={true}
-              handleFinalSubmit={handleFinalSubmit}
-              isLoading={isLoading}
-              hasChanges={hasChanges}
-              isEditing={isEditing}
-              finalButtonText={isEditing ? 'Guardar' : 'Finalizar'}
-            />
+          <div className="flex justify-between items-start mt-6 gap-4 flex-wrap">
+            <button
+              type="button"
+              onClick={prevStep}
+              className="bg-gray-300 hover:bg-gray-400 text-neutral py-2 px-4 rounded"
+            >
+              Anterior
+            </button>
+            <div className="flex flex-col items-end gap-1">
+              <button
+                type="submit"
+                className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded disabled:opacity-50"
+                disabled={isLoading || (isEditing && !hasChanges)}
+              >
+                {isLoading ? 'Guardando...' : isEditing ? 'Guardar' : 'Finalizar'}
+              </button>
+              {isEditing && !hasChanges && (
+                <span className="text-sm text-gray-500">Sin cambios realizados</span>
+              )}
+            </div>
+          </div>
         </>
       )}
     </form>
@@ -199,7 +215,6 @@ ProductForm.propTypes = {
   showErrors: PropTypes.bool.isRequired,
   setShowErrors: PropTypes.func.isRequired,
   isLoading: PropTypes.bool.isRequired,
-  isEditing: PropTypes.bool.isRequired,
   categories: PropTypes.array.isRequired,
-  hasChanges: PropTypes.bool.isRequired, 
+  isEditing: PropTypes.bool.isRequired,
 };

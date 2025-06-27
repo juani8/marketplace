@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTenant } from '../contexts/TenantContext';
+import { useAuth } from '../contexts/AuthContext';
 import { getAllPromotions, deletePromotion } from '../apis/promotionsService';
 import ButtonAdd from '../components/ButtonAdd';
 import PromotionsTable from '../components/PromotionsTable';
@@ -12,7 +12,7 @@ export default function PromotionsPage() {
   const [showModal, setShowModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const navigate = useNavigate();
-  const { tenantId } = useTenant();
+  const { tenantId, rol } = useAuth();
 
   useEffect(() => {
     async function fetchPromos() {
@@ -65,7 +65,9 @@ export default function PromotionsPage() {
     <div className="p-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0 mb-4">
         <h1 className="text-2xl font-bold text-gray-800">Promociones</h1>
-        <ButtonAdd onClick={() => navigate(`/promociones/create`)} text="Añadir Promoción" />
+          {rol === 'admin' && (
+            <ButtonAdd onClick={() => navigate(`/promociones/create`)} text="Añadir Promoción" />
+          )}
       </div>
 
       <PromotionsTable

@@ -1,7 +1,10 @@
 import PropTypes from 'prop-types';
 import { FaEdit, FaTrash } from 'react-icons/fa';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function PromotionsTable({ promotions, onEdit, onDelete }) {
+  const { rol } = useAuth();
+
   if (promotions.length === 0) {
     return (
       <div className="text-center text-gray-600 py-20 text-lg">
@@ -24,7 +27,9 @@ export default function PromotionsTable({ promotions, onEdit, onDelete }) {
               <th className="py-3 px-6 sticky top-0 z-10 bg-gray-100">Fecha Fin</th>
               <th className="py-3 px-6 sticky top-0 z-10 bg-gray-100"># Productos</th>
               <th className="py-3 px-6 sticky top-0 z-10 bg-gray-100">Productos con Descuento</th>
-              <th className="py-3 px-6 sticky top-0 z-10 bg-gray-100">Acciones</th>
+              {rol === 'admin' && (
+                <th className="py-3 px-6 sticky top-0 z-10 bg-gray-100">Acciones</th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -43,22 +48,24 @@ export default function PromotionsTable({ promotions, onEdit, onDelete }) {
                 <td className="py-3 px-6">
                   {promo.productos?.map((p) => p.nombre_producto).join(', ') || '—'}
                 </td>
-                <td className="py-3 px-6">
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => onEdit(promo)}
-                      className="text-green-500 hover:text-green-700"
-                    >
-                      <FaEdit />
-                    </button>
-                    <button
-                      onClick={() => onDelete(promo)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <FaTrash />
-                    </button>
-                  </div>
-                </td>
+                {rol === 'admin' && (
+                  <td className="py-3 px-6">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => onEdit(promo)}
+                        className="text-green-500 hover:text-green-700"
+                      >
+                        <FaEdit />
+                      </button>
+                      <button
+                        onClick={() => onDelete(promo)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <FaTrash />
+                      </button>
+                    </div>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
@@ -88,26 +95,28 @@ export default function PromotionsTable({ promotions, onEdit, onDelete }) {
               <span className="font-semibold">Fin:</span> {promo.fecha_fin?.split('T')[0]}
             </div>
             <div className="mb-2">
-                <span className="font-semibold"># Productos:</span> {promo.productos?.length || 0}
+              <span className="font-semibold"># Productos:</span> {promo.productos?.length || 0}
             </div>
             <div className="mb-2">
               <span className="font-semibold">Productos:</span>{' '}
               {promo.productos?.map((p) => p.nombre_producto).join(', ') || '—'}
             </div>
-            <div className="flex justify-end gap-2 mt-2">
-              <button
-                onClick={() => onEdit(promo)}
-                className="text-green-500 hover:text-green-700"
-              >
-                <FaEdit />
-              </button>
-              <button
-                onClick={() => onDelete(promo)}
-                className="text-red-500 hover:text-red-700"
-              >
-                <FaTrash />
-              </button>
-            </div>
+            {rol === 'admin' && (
+              <div className="flex justify-end gap-2 mt-2">
+                <button
+                  onClick={() => onEdit(promo)}
+                  className="text-green-500 hover:text-green-700"
+                >
+                  <FaEdit />
+                </button>
+                <button
+                  onClick={() => onDelete(promo)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  <FaTrash />
+                </button>
+              </div>
+            )}
           </div>
         ))}
       </div>
