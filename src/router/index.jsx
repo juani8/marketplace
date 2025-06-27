@@ -15,6 +15,7 @@ import EditCommercePage from '../pages/EditCommercePage';
 import RegisterInternalUsersPage from '../pages/RegisterInternalUsersPage';
 import SellersPage from '@/pages/SellersPage';
 import CreateCategoryPage from '../pages/CreateCategoryPage';
+import StockManagementPage from '../pages/StockManagementPage'; 
 import PrivateRoute from '../components/PrivateRoute';
 
 export default function AppRouter() {
@@ -37,6 +38,7 @@ export default function AppRouter() {
           <Route path="/products" element={<PrivateRoute><ProductsCataloguePage /></PrivateRoute>} />
           <Route path="/products/create" element={<PrivateRoute><CreateProductPage /></PrivateRoute>} />
           <Route path="/products/edit/:productId" element={<PrivateRoute><EditProductPage /></PrivateRoute>} />
+          <Route path="/stock" element={<PrivateRoute><StockManagementPage /></PrivateRoute>} />
           <Route path="/promociones" element={<PrivateRoute><PromotionsPage /></PrivateRoute>} />
           <Route path="/promociones/create" element={<PrivateRoute><CreatePromotionPage /></PrivateRoute>} />
           <Route path="/promociones/edit/:id" element={<PrivateRoute><EditPromotionPage /></PrivateRoute>} />
