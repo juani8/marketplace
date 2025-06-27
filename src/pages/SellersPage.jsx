@@ -4,6 +4,7 @@ import { getAllSellers, deleteSeller } from '../apis/sellersService';
 import SellersTable from '../components/SellersTable';
 import ButtonAdd from '../components/ButtonAdd';
 import SuccessModal from '../components/SuccessModal';
+import ConfirmModal from '../components/ConfirmModal';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function SellersPage() {
@@ -14,6 +15,9 @@ export default function SellersPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [sellerToDelete, setSellerToDelete] = useState(null);
+
 
   useEffect(() => {
     async function fetchSellers() {
@@ -34,13 +38,16 @@ export default function SellersPage() {
     navigate(`/sellers/edit/${sellerId}`);
   };
 
-  const handleDelete = async (sellerId) => {
-    const confirm = window.confirm('¿Estás seguro que querés eliminar este comercio?');
-    if (!confirm) return;
+  const confirmDelete = (sellerId) => {
+    setSellerToDelete(sellerId);
+    setConfirmOpen(true);
+  };
 
+  const handleConfirmDelete = async () => {
+    setConfirmOpen(false);
     try {
-      await deleteSeller(sellerId);
-      setSellers((prev) => prev.filter((s) => s.comercio_id !== sellerId));
+      await deleteSeller(sellerToDelete);
+      setSellers((prev) => prev.filter((s) => s.comercio_id !== sellerToDelete));
       setSuccessMessage('Comercio eliminado correctamente');
       setShowModal(true);
     } catch (err) {
@@ -49,13 +56,14 @@ export default function SellersPage() {
     }
   };
 
+
     return (
     <div className="p-6">
-        <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold text-gray-800">Comercios</h1>
-        {rol === 'admin' && (
-            <ButtonAdd onClick={() => navigate('/sellers/create')} text="Añadir Comercio" />
-        )}
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0 mb-4">
+          <h1 className="text-2xl font-bold text-gray-800">Mis Comercios</h1>
+          {rol === 'admin' && (
+              <ButtonAdd onClick={() => navigate('/sellers/create')} text="Añadir Comercio" />
+          )}
         </div>
 
         {isLoading ? (
@@ -69,15 +77,20 @@ export default function SellersPage() {
           <SellersTable
             sellers={sellers}
             onEdit={handleEdit}
-            onDelete={handleDelete}
+            onDelete={confirmDelete}
           />
         )}
-
         <SuccessModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         successMessage={successMessage}
         redirectTo="/sellers"
+        />
+        <ConfirmModal
+          isOpen={confirmOpen}
+          onClose={() => setConfirmOpen(false)}
+          onConfirm={handleConfirmDelete}
+          message="¿Estás seguro de que querés eliminar este comercio?"
         />
     </div>
     );
