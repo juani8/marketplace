@@ -7,6 +7,7 @@ import {
   FaSignOutAlt,
   FaTachometerAlt,
   FaUserPlus,
+  FaWarehouse,
 } from 'react-icons/fa';
 import PropTypes from 'prop-types';
 import { useAuth } from '../contexts/AuthContext';
@@ -16,6 +17,7 @@ export default function Sidebar({ isCollapsed, toggleSidebar, onLogoutClick }) {
   const { rol } = useAuth();
   const isActive = (path) => location.pathname.startsWith(path);
   const isAdmin = rol === 'admin';
+  const isOperator = rol === 'operador';
 
   return (
     <aside
@@ -51,8 +53,15 @@ export default function Sidebar({ isCollapsed, toggleSidebar, onLogoutClick }) {
 
         <Link to="/products" className={`flex items-center gap-3 px-2 py-2 rounded hover:bg-blue-600 ${isActive('/products') ? 'bg-blue-700' : ''}`}>
           <FaBoxOpen className="text-xl" />
-          {!isCollapsed && <span>Productos</span>}
+          {!isCollapsed && <span>Catálogo de Productos</span>}
         </Link>
+
+        {isOperator && (
+          <Link to="/stock" className={`flex items-center gap-3 px-2 py-2 rounded hover:bg-blue-600 ${isActive('/stock') ? 'bg-blue-700' : ''}`}>
+            <FaWarehouse className="text-xl" />
+            {!isCollapsed && <span>Gestión de Stock</span>}
+          </Link>
+        )}
 
         <Link to="/promociones" className={`flex items-center gap-3 px-2 py-2 rounded hover:bg-blue-600 ${isActive('/promociones') ? 'bg-blue-700' : ''}`}>
           <FaTags className="text-xl" />
