@@ -5,7 +5,7 @@ import { getAllSellers } from '@/apis/sellersService';
 import { getProductsByComercioId, updateProductStock } from '@/apis/productsService';
 import Button from '@/components/Button';
 import Spinner from '@/components/Spinner';
-import InputField from '@/components/InputField';
+import InputField from '@/components/Inputfield';
 import { Pencil, Save, X } from 'lucide-react';
 
 export default function StockManagementPage() {
