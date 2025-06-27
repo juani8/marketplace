@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 export default function AuthForm({
-  title = 'Formulario',
+  title = 'Iniciar Sesion',
   onSubmit,
   showForgotPassword = false,
-  submitButtonText = 'Enviar',
+  submitButtonText = 'Iniciar Sesion',
 }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -71,8 +71,18 @@ export default function AuthForm({
       >
         {submitButtonText}
       </button>
+
+    <div className="mt-4 text-center">
+    <span className="text-sm text-gray-600">¿No tenés cuenta? </span>
+    <Link
+      to="/register-tenant"
+      className="text-sm text-blue-600 font-semibold hover:underline ml-1"
+    >
+      Registrarse
+    </Link>
+    </div>
     </form>
-  );
+);
 }
 
 AuthForm.propTypes = {
@@ -81,3 +91,4 @@ AuthForm.propTypes = {
   showForgotPassword: PropTypes.bool,
   submitButtonText: PropTypes.string,
 };
+

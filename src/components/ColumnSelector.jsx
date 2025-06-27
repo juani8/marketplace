@@ -1,11 +1,13 @@
 import PropTypes from 'prop-types';
 
-export default function ColumnSelector({ allColumns, visibleColumns, onChange, labelMap = {} }) {
+export default function ColumnSelector({ allColumns, visibleColumns = [], onChange, labelMap = {} }) {
+  const columns = visibleColumns || [];
+
   const toggleColumn = (column) => {
-    if (visibleColumns.includes(column)) {
-      onChange(visibleColumns.filter((col) => col !== column));
+    if (columns.includes(column)) {
+      onChange(columns.filter((col) => col !== column));
     } else {
-      onChange([...visibleColumns, column]);
+      onChange([...columns, column]);
     }
   };
 
@@ -17,7 +19,7 @@ export default function ColumnSelector({ allColumns, visibleColumns, onChange, l
           <label key={col} className="flex items-center gap-2 text-sm">
             <input
               type="checkbox"
-              checked={visibleColumns.includes(col)}
+              checked={columns.includes(col)}
               onChange={() => toggleColumn(col)}
               className="form-checkbox"
             />

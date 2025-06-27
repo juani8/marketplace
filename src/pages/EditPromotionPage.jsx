@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import PromotionForm from '../components/PromotionForm';
 import SuccessModal from '../components/SuccessModal';
 import { getAllPromotions, updatePromotion } from '../apis/promotionsService';
@@ -7,6 +8,7 @@ import { getAllPromotions, updatePromotion } from '../apis/promotionsService';
 export default function EditPromotionPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { tenantId } = useAuth();
 
   const [formData, setFormData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -19,7 +21,7 @@ export default function EditPromotionPage() {
   useEffect(() => {
     const fetchPromotion = async () => {
         try {
-          const allPromos = await getAllPromotions();
+          const allPromos = await getAllPromotions(tenantId);
           const promo = allPromos.find(p => p.promocion_id === parseInt(id));
           if (!promo) {
             setError('Promoción no encontrada.');

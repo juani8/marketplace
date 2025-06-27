@@ -6,17 +6,17 @@ export default function TableActions({ onEdit, onDelete }) {
     <div className="flex items-center gap-3">
       <button
         onClick={onEdit}
-        className="text-green-500 hover:text-green-700 text-l"
+        className="text-green-500 hover:text-green-700"
         title="Editar"
       >
-        <FaEdit />
+        <FaEdit className="w-4 h-4 md:w-4 md:h-4" />
       </button>
       <button
         onClick={onDelete}
-        className="text-red-500 hover:text-red-700 text-l"
+        className="text-red-500 hover:text-red-700"
         title="Eliminar"
       >
-        <FaTrash />
+        <FaTrash className="w-4 h-4 md:w-4 md:h-4" /> 
       </button>
     </div>
   );

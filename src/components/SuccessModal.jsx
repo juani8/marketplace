@@ -31,7 +31,6 @@ export default function SuccessModal({
         <h2 className="text-xl sm:text-2xl font-bold mb-4 text-gray-800">
           {successMessage}
         </h2>
-        <p className="text-sm text-gray-600">Redirigiendo...</p>
       </div>
     </div>
   );

@@ -1,48 +1,81 @@
-import AuthForm from '../components/AuthForm';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { checkBackendStatus } from '@apis/api_EJEMPLO';
+import AuthForm from '../components/AuthForm';
+import { useAuth } from '../contexts/AuthContext';
+import { login } from '../apis/authService'; // Endpoint real
+import { checkBackendStatus } from '@apis/api_EJEMPLO'; // Opcional
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const { setSessionInfo } = useAuth();
+
+  const [error, setError] = useState('');
   const [backendStatus, setBackendStatus] = useState(null);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchBackendStatus = async () => {
       try {
         const status = await checkBackendStatus();
         setBackendStatus(status);
-      } catch (err) {
-        setError('No se pudo conectar al backend');
+      } catch {
+        setBackendStatus(null);
       }
     };
     fetchBackendStatus();
   }, []);
 
-  const handleLogin = ({ email, password }) => {
-    console.log('Login con:', email, password);
+  const handleLogin = async ({ email, password }) => {
+    setError('');
+    try {
+      const response = await login(email, password);
+      const { user, tokens } = response;
+      const { accessToken, refreshToken } = tokens;
 
-    // validar credenciales y redirigir
-    navigate('/perfil');
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+
+      const sessionInfo = {
+        usuarioId: user.usuario_id,
+        nombre: user.nombre,
+        email: user.email,
+        rol: user.rol,
+        tenantId: user.tenant_id,
+        comercios: user.comercios || [], // ✅ necesario para AuthContext
+        accessToken,
+        refreshToken
+      };
+      console.log('📦 sessionInfo guardado:', sessionInfo);
+
+      localStorage.setItem('sessionInfo', JSON.stringify(sessionInfo));
+      setSessionInfo(sessionInfo);
+
+      if (user.rol === 'admin') {
+        navigate('/sellers');
+      } else {
+        navigate('/products');
+      }
+
+    } catch (err) {
+      console.error(err);
+      setError('Credenciales incorrectas. Por favor, verificá e intentá de nuevo.');
+    }
   };
 
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <div className="flex flex-col items-center justify-center min-h-screen">
       <AuthForm
         title="Iniciar sesión"
         submitButtonText="Iniciar sesión"
         onSubmit={handleLogin}
         showForgotPassword={true}
+        error={error}
       />
-      <div style={{ marginTop: 16, textAlign: 'center' }}>
-        {error && <span style={{ color: 'red', display: 'block' }}>{error}</span>}
-        {backendStatus && (
-          <span style={{ color: 'green', display: 'block' }}>
-            Backend status: {backendStatus.status} ({backendStatus.timestamp})
-          </span>
-        )}
-      </div>
+      {backendStatus && (
+        <div className="mt-4 text-center text-green-600">
+          Backend status: {JSON.stringify(backendStatus)}
+        </div>
+      )}
     </div>
   );
 }

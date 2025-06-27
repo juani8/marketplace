@@ -4,16 +4,14 @@ import ProductForm from '../components/ProductForm';
 import SuccessModal from '../components/SuccessModal';
 import { getProductById, updateProduct } from '../apis/productsService';
 import { getAllCategories } from '../apis/categoriesService';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function EditProductPage() {
-  const { tenantId, productId } = useParams();
+  const { productId } = useParams();
+  const { tenantId } = useAuth();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState(null);
-  const [originalFormData, setOriginalFormData] = useState(null);
-  const [hasChanges, setHasChanges] = useState(false);
-  const [noChangesNotice, setNoChangesNotice] = useState(false);
-
   const [step, setStep] = useState(1);
   const [error, setError] = useState('');
   const [showErrors, setShowErrors] = useState(false);
@@ -30,7 +28,7 @@ export default function EditProductPage() {
         ]);
 
         if (!product) {
-          navigate(`/products/catalogue/${tenantId}`);
+          navigate('/products');
           return;
         }
 
@@ -39,8 +37,12 @@ export default function EditProductPage() {
           label: cat.nombre,
         }));
 
-        setFormData({ ...product });
-        setOriginalFormData({ ...product });
+        setFormData({
+          ...product,
+          categoria_id: String(product.categoria_id),
+          precio: String(product.precio),
+        });
+
         setCategories(formattedCategories);
       } catch (err) {
         console.error('Error al cargar producto:', err);
@@ -51,14 +53,7 @@ export default function EditProductPage() {
     };
 
     fetchData();
-  }, [tenantId, productId, navigate]);
-
-  useEffect(() => {
-    if (formData && originalFormData) {
-      const isDifferent = JSON.stringify(formData) !== JSON.stringify(originalFormData);
-      setHasChanges(isDifferent);
-    }
-  }, [formData, originalFormData]);
+  }, [productId, navigate]);
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
@@ -77,29 +72,42 @@ export default function EditProductPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
     setError('');
+    setIsLoading(true);
 
     try {
-      if (!hasChanges) {
-        setNoChangesNotice(true);
-        setTimeout(() => setNoChangesNotice(false), 3000);
-        return;
-      }
+      const { cantidad_stock: _, ...restFormData } = formData;
 
-      const cleanFormData = { ...formData };
-      delete cleanFormData.catalogo_id;
+      const payload = {
+        ...restFormData,
+        tenant_id: tenantId,
+        nombre_producto: formData.nombre_producto.trim(),
+        descripcion: formData.descripcion.trim(),
+        categoria_id: Number(formData.categoria_id),
+        precio: Number(formData.precio),
+        imagenes: formData.imagenes.length > 0 ? formData.imagenes : [],
+      };
 
-      await updateProduct(tenantId, cleanFormData);
+      await updateProduct(tenantId, payload);
       setShowModal(true);
-      setOriginalFormData({ ...formData }); // actualiza referencia
     } catch (err) {
-      console.error('Error actualizando producto:', err);
-      setError('❌ Error al actualizar el producto');
+      const mensaje =
+        err.response?.data?.message || err.response?.data?.error || err.message || 'Error desconocido';
+      console.error('❌ Error en updateProduct:', mensaje);
+      setError(`❌ Error al actualizar el producto: ${mensaje}`);
     } finally {
       setIsLoading(false);
     }
   };
+
+  const isFormValid = () =>
+    formData?.nombre_producto?.trim() &&
+    formData?.descripcion?.trim() &&
+    formData?.categoria_id &&
+    formData?.precio > 0;
+
+  const nextStep = () => setStep((prev) => prev + 1);
+  const prevStep = () => setStep((prev) => prev - 1);
 
   if (isLoading || !formData) {
     return (
@@ -118,34 +126,38 @@ export default function EditProductPage() {
         <h1 className="text-2xl font-bold text-gray-800">Editar Producto</h1>
       </div>
 
-      {noChangesNotice && (
-        <div className="bg-yellow-100 text-yellow-800 border border-yellow-300 p-3 rounded mb-4">
-          No realizaste cambios.
-        </div>
-      )}
-
       <ProductForm
         formData={formData}
         handleChange={handleChange}
         handleSubmit={handleSubmit}
         step={step}
         setStep={setStep}
-        nextStep={() => setStep((s) => s + 1)}
-        prevStep={() => setStep((s) => s - 1)}
+        nextStep={nextStep}
+        prevStep={prevStep}
         error={error}
         showErrors={showErrors}
         setShowErrors={setShowErrors}
         isLoading={isLoading}
         categories={categories}
-        hasChanges={hasChanges}
+        hasChanges={isFormValid()}
       />
+
+      <div className="mt-4">
+        <button
+          type="button"
+          onClick={() => navigate(`/products`)}
+          className="text-sm text-gray-500 hover:text-gray-700 underline"
+        >
+          Cancelar y volver al catálogo
+        </button>
+      </div>
 
       <SuccessModal
         isOpen={showModal}
         onClose={() => {
           setShowModal(false);
-          navigate('/products');
-      }}
+          navigate(`/products`);
+        }}
         successMessage="¡Producto modificado exitosamente!"
         redirectTo={`/products`}
         buttonText="Volver al Catálogo"

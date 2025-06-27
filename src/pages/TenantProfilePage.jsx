@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
-import TenantForm from '../components/TenantForm';
+import TenantForm from '../components/SellerForm';
 import SuccessModal from '../components/SuccessModal';
 import Button from '../components/Button';
 import { Pencil } from 'lucide-react';
-import { getTenantById, updateTenant } from '../apis/tenantsService';
 
 export default function TenantProfilePage() {
 
@@ -193,7 +192,7 @@ export default function TenantProfilePage() {
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         successMessage="¡Datos actualizados exitosamente!"
-        redirectTo="/perfil"
+        redirectTo="/sellers"
         buttonText="Volver a Mi Perfil"
       />
     </div>

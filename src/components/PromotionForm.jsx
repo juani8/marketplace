@@ -5,7 +5,8 @@ import Select from './Select';
 import InputRowGrid from './InputRowGrid';
 import Button from './Button';
 import ProductTable from './ProductTable';
-import { getAllProducts } from '../apis/productsService';
+import { getAllProductsByTenant } from '../apis/productsService';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function PromotionForm({
   formData,
@@ -22,26 +23,28 @@ export default function PromotionForm({
   const [products, setProducts] = useState([]);
   const [isFetchingProducts, setIsFetchingProducts] = useState(true);
 
+  const { tenantId } = useAuth(); // 🔸 nuevo
+
   useEffect(() => {
-    if (!formData) return;
-  
+    if (!formData || !tenantId) return;
+
     async function fetchProducts() {
       try {
-        const data = await getAllProducts();
-  
+        const data = await getAllProductsByTenant(tenantId); // 🔸 nuevo
+
         const enrichedData = data.map((p) => {
           const promociones = p.promociones || [];
-  
+
           const perteneceAPromoActual = promociones.some(
             (promo) => String(promo.promocion_id) === String(editingPromotionId)
           );
-  
+
           return {
             ...p,
             _forzarMostrar: perteneceAPromoActual,
           };
         });
-  
+
         setProducts(enrichedData);
       } catch (err) {
         console.error('Error al cargar productos:', err);
@@ -49,9 +52,9 @@ export default function PromotionForm({
         setIsFetchingProducts(false);
       }
     }
-  
+
     fetchProducts();
-  }, [editingPromotionId, formData]);
+  }, [editingPromotionId, formData, tenantId]); 
   
 
   const validate = () => {
@@ -301,8 +304,8 @@ const productosDisponibles = products.filter((p) => {
               ? 'Guardando...'
               : 'Creando...'
             : editingPromotionId
-            ? 'Guardar Cambios'
-            : 'Crear Promoción'}
+            ? 'Guardar'
+            : 'Crear'}
         </Button>
       </div>
     </form>
