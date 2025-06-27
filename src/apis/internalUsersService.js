@@ -15,7 +15,7 @@ export const getAllCommerces = async () => {
  *   email: string,
  *   password: string,
  *   rol: 'admin' | 'operador',
- *   comercios_ids?: number[]
+ *   comercios_autorizados_id?: number[]
  * }} payload
  */
 export const registerInternalUser = async (payload) => {
