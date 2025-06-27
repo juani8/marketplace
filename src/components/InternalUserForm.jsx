@@ -154,17 +154,21 @@ export default function InternalUserForm({ onSuccess }) {
         <div>
           <label className="block text-sm font-medium mb-2">Comercios asignados</label>
           <div className="flex flex-col gap-1 max-h-40 overflow-y-auto border p-2 rounded-md">
-            {comercios.map((comercio) => (
-              <label key={comercio.comercio_id} className="text-sm flex gap-2 items-center">
-                <input
-                  type="checkbox"
-                  value={comercio.comercio_id}
-                  checked={form.comercioIds.includes(Number(comercio.comercio_id))}
-                  onChange={handleCheckboxChange}
-                />
-                {comercio.nombre} ({comercio.direccion})
-              </label>
-            ))}
+            {comercios.length === 0 ? (
+              <p className="text-sm text-gray-500 italic">No hay comercios disponibles para asignar</p>
+            ) : (
+              comercios.map((comercio) => (
+                <label key={comercio.comercio_id} className="text-sm flex gap-2 items-center">
+                  <input
+                    type="checkbox"
+                    value={comercio.comercio_id}
+                    checked={form.comercioIds.includes(Number(comercio.comercio_id))}
+                    onChange={handleCheckboxChange}
+                  />
+                  {comercio.nombre} ({comercio.direccion})
+                </label>
+              ))
+            )}
           </div>
         </div>
       )}

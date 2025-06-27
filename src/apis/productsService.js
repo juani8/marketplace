@@ -80,3 +80,21 @@ export const deleteProduct = async (productId) => {
   return response.data;
 };
 
+// Actualizar el stock de un producto en un comercio
+export const updateStock = async (comercioId, productoId, cantidad) => {
+  const response = await api.patch(`/sellers/${comercioId}/products/${productoId}/stock`, {
+    cantidad_stock: cantidad,
+  });
+  return response.data;
+};
+
+// Obtener productos de un comercio
+export const getProductsByComercioId = async (comercioId) => {
+  const res = await api.get(`/sellers/${comercioId}/products`);
+  return res.data.data;
+};
+
+// Actualizar stock
+export const updateProductStock = async (comercioId, productoId, body) => {
+  await api.patch(`/sellers/${comercioId}/products/${productoId}/stock`, body);
+};
