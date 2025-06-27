@@ -57,7 +57,14 @@ export function AuthProvider({ children }) {
     if (rol !== undefined) setRol(rol);
     if (tenantId !== undefined) setTenantId(tenantId);
     if (comercios !== undefined) setComercios(comercios || []);
-    if (accessToken) setAccessToken(accessToken);
+    if (accessToken) {
+      setAccessToken(accessToken);
+      try {
+        console.log('🧾 Token decodificado:', JSON.parse(atob(accessToken.split('.')[1])));
+      } catch (err) {
+        console.error('❌ Error al decodificar el token:', err);
+      }
+    }
     if (refreshToken) setRefreshToken(refreshToken);
   };
 

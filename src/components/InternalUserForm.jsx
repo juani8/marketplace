@@ -78,7 +78,7 @@ export default function InternalUserForm({ onSuccess }) {
       email: form.email,
       password: form.password,
       rol: form.rol,
-      comercios_ids: form.rol === 'operador' ? form.comercioIds : [],
+      comercios_autorizados_id: form.rol === 'operador' ? form.comercioIds : [],
     };
 
     try {
