@@ -16,6 +16,7 @@ import RegisterInternalUsersPage from '../pages/RegisterInternalUsersPage';
 import SellersPage from '@/pages/SellersPage';
 import CreateCategoryPage from '../pages/CreateCategoryPage';
 import StockManagementPage from '../pages/StockManagementPage'; 
+import BilleteraPage from '@pages/BilleteraPage';
 import PrivateRoute from '../components/PrivateRoute';
 
 export default function AppRouter() {
@@ -45,6 +46,7 @@ export default function AppRouter() {
           <Route path="/usuarios" element={<PrivateRoute><RegisterInternalUsersPage /></PrivateRoute>} />
           <Route path="/crear-comercio" element={<PrivateRoute><CreateCommercePage /></PrivateRoute>} />
           <Route path="/categories/create" element={<PrivateRoute><CreateCategoryPage /></PrivateRoute>} />
+          <Route path="/billetera" element={<PrivateRoute><BilleteraPage /></PrivateRoute>} />
         </Route>
       </Routes>
     </Router>
